@@ -1,0 +1,33 @@
+{
+  "name": "ServiHogar",
+  "short_name": "ServiHogar",
+  "description": "Pide servicios de limpieza, jardinería, electricidad, plomería y más en Morales, Izabal.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#F1F5F3",
+  "theme_color": "#0D5A6B",
+  "lang": "es-GT",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

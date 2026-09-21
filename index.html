@@ -1,0 +1,690 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>ServiHogar</title>
+
+<!-- PWA -->
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#0D5A6B">
+<meta name="description" content="Pide servicios de limpieza, jardinería, electricidad, plomería y más en Morales, Izabal.">
+<link rel="icon" href="./icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="./icon-512.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ServiHogar">
+<meta name="mobile-web-app-capable" content="yes">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,600..900&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F1F5F3; --surface:#FFFFFF; --ink:#10262B; --muted:#526569; --line:#D3DEDB;
+  --primary:#0D5A6B; --on-primary:#FFFFFF; --accent:#F5B21B; --on-accent:#2B2100;
+  --tint:#E0EEEC; --wa:#0E7C45; --on-wa:#FFFFFF; --danger:#B3261E; --focus:#0D5A6B; --avl:86%;
+  --display:"Archivo","Arial Narrow","Helvetica Neue",Arial,sans-serif;
+  --body:"Figtree",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  color-scheme:light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0B1A1E; --surface:#122529; --ink:#E6F0EE; --muted:#9AB0B2; --line:#264146;
+    --primary:#5CC3D6; --on-primary:#062028; --accent:#F5B21B; --on-accent:#2B2100;
+    --tint:#173338; --wa:#2DBE6C; --on-wa:#04210F; --danger:#FF8A80; --focus:#F5B21B; --avl:26%;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0B1A1E; --surface:#122529; --ink:#E6F0EE; --muted:#9AB0B2; --line:#264146;
+  --primary:#5CC3D6; --on-primary:#062028; --accent:#F5B21B; --on-accent:#2B2100;
+  --tint:#173338; --wa:#2DBE6C; --on-wa:#04210F; --danger:#FF8A80; --focus:#F5B21B; --avl:26%;
+  color-scheme:dark;
+}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 110px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 1rem/1.5 var(--body);-webkit-text-size-adjust:100%}
+h1,h2,h3{font-family:var(--display);font-stretch:108%;font-weight:800;line-height:1.12;letter-spacing:-.01em;margin:0}
+p{margin:0}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.wrap{max-width:720px;margin:0 auto;padding:0 16px}
+[hidden]{display:none!important}
+
+/* Encabezado */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;padding-top:12px;font:800 1.3rem var(--display);font-stretch:114%;letter-spacing:-.01em}
+.mark{width:36px;height:36px;flex:none;display:grid;place-items:center}
+.tabs{display:flex;gap:2px;margin-top:6px}
+.tab{flex:1;background:none;border:0;border-bottom:3px solid transparent;padding:10px 4px 11px;font-weight:600;font-size:.95rem;color:var(--muted);cursor:pointer}
+.tab[aria-current="page"]{color:var(--ink);border-bottom-color:var(--accent)}
+
+main{padding-top:22px;padding-bottom:40px}
+body.has-bar main{padding-bottom:128px}
+.intro h1{font-size:clamp(1.9rem,7.5vw,2.7rem)}
+.intro p{color:var(--muted);margin-top:8px;max-width:52ch}
+
+/* Pasos */
+.stepper{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:20px 0 22px;padding:0;list-style:none}
+.stepper li{font-size:.82rem;font-weight:600;color:var(--muted);padding-top:8px;border-top:4px solid var(--line)}
+.stepper li[data-state="done"]{border-top-color:var(--primary)}
+.stepper li[data-state="now"]{border-top-color:var(--primary);color:var(--ink)}
+
+/* Servicios */
+.tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+@media (min-width:600px){.tiles{grid-template-columns:repeat(3,1fr)}}
+.tile{display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:3px;padding:14px;min-height:150px;background:var(--surface);border:1.5px solid var(--line);border-radius:14px;cursor:pointer}
+.tile:hover{border-color:var(--primary)}
+.tile:active{transform:scale(.98)}
+.ico{width:44px;height:44px;border-radius:12px;background:var(--tint);color:var(--primary);display:grid;place-items:center;flex:none}
+.tile .ico{margin-bottom:10px}
+.t-name{font:800 1.05rem/1.15 var(--display);font-stretch:108%}
+.t-hint{font-size:.88rem;color:var(--ink)}
+.t-count{font-size:.82rem;color:var(--muted);margin-top:auto;padding-top:6px}
+
+/* Formulario */
+.back{display:inline-flex;align-items:center;gap:6px;background:none;border:0;padding:8px 8px 8px 0;margin-bottom:6px;color:var(--primary);font-weight:700;cursor:pointer}
+.h-svc{display:flex;align-items:center;gap:12px;font-size:1.6rem;margin-bottom:20px}
+.h-svc .ico{width:40px;height:40px}
+.field,.group{margin:0 0 20px;padding:0;border:0}
+.field>label,.lbl,.group>legend{display:block;font-weight:700;font-size:.95rem;margin:0 0 8px;padding:0}
+.opt-txt{font-weight:400;color:var(--muted)}
+input[type=text],input[type=number],input[type=date],textarea{width:100%;min-height:48px;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);font:inherit;font-size:1rem}
+textarea{resize:vertical}
+input:focus,textarea:focus{border-color:var(--primary)}
+.hint{font-size:.85rem;color:var(--muted);margin-top:6px}
+.unit{position:relative}
+.unit input{padding-right:52px}
+.unit span{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--muted);font-weight:600;pointer-events:none}
+.linkbtn{background:none;border:0;padding:10px 0 4px;color:var(--primary);font-weight:600;font-size:.9rem;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.calc{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
+.calc label{display:block;font-size:.85rem;color:var(--muted);margin-bottom:4px}
+.opt{display:flex;align-items:center;gap:12px;padding:12px 14px;margin-bottom:8px;border:1.5px solid var(--line);border-radius:12px;background:var(--surface);cursor:pointer}
+.opt:has(input:checked){border-color:var(--primary);box-shadow:inset 0 0 0 1px var(--primary)}
+.opt input{accent-color:var(--primary);width:20px;height:20px;margin:0;flex:none}
+.opt-body{flex:1;min-width:0;display:flex;flex-direction:column}
+.opt-name{font-weight:700}
+.opt-desc{font-size:.87rem;color:var(--muted);line-height:1.35}
+.opt-rate{font-weight:700;white-space:nowrap}
+.quote{background:var(--accent);color:var(--on-accent);border-radius:14px;padding:16px;margin:0 0 22px;display:flex;flex-direction:column;gap:2px}
+.quote.empty{background:var(--tint);color:var(--muted)}
+.q-label{font-size:.85rem;font-weight:600}
+.q-num{font:800 2.3rem/1.1 var(--display);font-stretch:112%}
+.q-calc{font-size:.9rem}
+.note{background:var(--tint);border-radius:12px;padding:14px;margin:0 0 22px;font-size:.93rem}
+.chip-row{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:44px;padding:0 16px;border-radius:999px;border:1.5px solid var(--line);background:var(--surface);font-weight:600;font-size:.93rem;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--primary);border-color:var(--primary);color:var(--on-primary)}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);border:1.5px solid var(--line);border-radius:12px;overflow:hidden;background:var(--surface)}
+.seg label{position:relative;text-align:center;padding:12px 4px;font-weight:600;font-size:.93rem;cursor:pointer}
+.seg label+label{border-left:1.5px solid var(--line)}
+.seg input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer}
+.seg label:has(input:checked){background:var(--primary);color:var(--on-primary)}
+.seg label:has(input:focus-visible){outline:3px solid var(--focus);outline-offset:-3px}
+.err{color:var(--danger);font-weight:600;min-height:1.5em}
+
+/* Trabajadores */
+.sub{color:var(--muted);margin:-8px 0 18px}
+.worker{display:flex;flex-direction:column;gap:10px;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;background:var(--surface);margin-bottom:8px}
+label.worker{flex-direction:row;align-items:center;gap:12px;cursor:pointer}
+label.worker:has(input:checked){border-color:var(--primary);box-shadow:inset 0 0 0 1px var(--primary)}
+label.worker input{accent-color:var(--primary);width:20px;height:20px;margin:0;flex:none}
+.w-row{display:flex;align-items:center;gap:12px;min-width:0}
+.av{--h:190;width:44px;height:44px;border-radius:50%;flex:none;display:grid;place-items:center;font:800 1rem var(--display);background:hsl(var(--h) 40% var(--avl));color:var(--ink)}
+.w-main{display:flex;flex-direction:column;min-width:0;flex:1}
+.w-main strong{font-weight:700}
+.w-trades{font-size:.88rem;color:var(--muted);line-height:1.35}
+.w-actions{display:flex;gap:8px}
+.mini{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;border-radius:10px;font-weight:700;font-size:.93rem;text-decoration:none;border:1.5px solid var(--primary);color:var(--primary);background:transparent}
+.mini.wa{background:var(--wa);border-color:var(--wa);color:var(--on-wa)}
+.filters{display:flex;gap:8px;overflow-x:auto;margin:0 -16px 16px;padding:2px 16px 8px}
+.filters .chip{flex:none}
+.team{list-style:none;margin:0;padding:0}
+.preview{background:var(--surface);border:1.5px dashed var(--line);border-radius:12px;padding:14px;margin:18px 0 6px}
+.preview h3{font-size:1rem;margin-bottom:6px}
+.preview pre{margin:8px 0 12px;white-space:pre-wrap;word-break:break-word;font:inherit;font-size:.93rem;line-height:1.45}
+.preview .to{font-size:.88rem;color:var(--muted)}
+
+/* Planes */
+.plan{background:var(--surface);border:1.5px solid var(--line);border-radius:16px;padding:18px;margin-bottom:16px}
+.plan-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.plan-head h3{font-size:1.3rem}
+.badge{flex:none;background:var(--tint);color:var(--primary);font-weight:700;font-size:.82rem;padding:4px 10px;border-radius:999px}
+.plan-sub{font-weight:600;margin-top:4px}
+.plan-about{color:var(--muted);margin-top:8px;font-size:.95rem}
+.plan-price{display:flex;align-items:baseline;gap:8px;margin-top:14px}
+.price{font:800 2.2rem/1 var(--display);font-stretch:112%}
+.per{color:var(--muted);font-weight:600}
+.plan-cmp{margin-top:6px;font-size:.93rem}
+.save{display:inline-block;background:var(--accent);color:var(--on-accent);font-weight:700;padding:1px 10px;border-radius:999px;font-size:.88rem}
+.facts{display:grid;gap:6px;margin:14px 0}
+.facts div{display:flex;justify-content:space-between;gap:12px;font-size:.93rem;border-top:1px solid var(--line);padding-top:6px}
+.facts dt{color:var(--muted)}
+.facts dd{margin:0;font-weight:600;text-align:right}
+details{margin:6px 0 16px}
+summary{cursor:pointer;font-weight:700;color:var(--primary);padding:6px 0}
+details ul{margin:6px 0 0;padding-left:20px}
+details li{margin-bottom:6px}
+
+/* Botones y barra */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 20px;border-radius:12px;border:0;background:var(--primary);color:var(--on-primary);font-weight:700;font-size:1rem;text-decoration:none;cursor:pointer}
+.btn.wa{background:var(--wa);color:var(--on-wa)}
+.btn.ghost{background:transparent;color:var(--primary);border:1.5px solid var(--primary)}
+.btn.full{width:100%}
+.btn[aria-disabled="true"]{opacity:.45}
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--surface);border-top:1px solid var(--line);padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px))}
+.bar-in{max-width:720px;margin:0 auto;display:flex;align-items:center;gap:14px}
+.bar-info{flex:1;min-width:0}
+.bar-label{display:block;font-size:.82rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-value{display:block;font:800 1.35rem/1.15 var(--display);font-stretch:110%}
+.foot{margin-top:32px;padding-top:16px;border-top:1px solid var(--line);font-size:.88rem;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}.tile:active{transform:none}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="brand"><span class="mark" id="mark"><img src="data:image/png;base64,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s2zBC22glKs0opSAgBUdOBWqIybs/1obe9gvYrE+82dL2rnknA3qvXvv9UXEnbDPwRcvWrb62hHtbPL6fSrD3UuszTRk3LBzL9ReB/6qYtxZ1yilvG+rgm51BWwj0Zw465+ZerH+9PUbyjPr4jqRys94rzk25eXNKherXF516L5XPPTgb2blvQBBdMZ7Z1htZnHvZKxU2iT3+UCp8mUA1VJlmFnFpEmTQgBplPYb4vdO9dxFZwkbyNh8qCSmlNq+QqYAiV4SiG+LTMzEw95eCeMuK3MOvh3g97//vXvOOef4ANddftGgPz415xbHaz7g4pEVnDow5edra028baVu3nX0q/royUe3Uape0mlHtTKp16oKkPR4R02ZG2zMbuxF9U13laz+4KC4bZIVXlGQfrnGfWZJYLt0637niw9OT/ccNqwOoK552R61+snbcnrJWCcWoDHYoDhfqvv8tSTc91ep2IC3AEQkviEz89R8bME1xlnVtc7WW0diopQ2CFgbcWxKgdLbhyUoQpEQ7Zly1YV4MOThSufsS5RSX8yff7Z78cWfydy5c4NkPMao0RPOXv75xmkTupi2V40qDnolPJtFxXK7DF6sJpx0bvt+4+YKKERoLVKvVRQgktaoyOWsnjvrQOf9J//UfsuSjuKY/INLJD799UaaYm1f+9H+e112/4zb3/aDiJ6vyc89tYa//s6PLU1kPV+MMRZAaTElKoUEnWyRHTZ17islc4fts+jXHRJrh66TNXiBDrVxjCYSvOsoUsQAS4glE1oQhTaKUKJhiiBW5W25LjE66LumONj3tIrkmL+lBT1hTlpPnDglBOSOm6/vedeDf/11Ua7uyIv3LOKYAQnP5nOxxopull3HTq784UVTlVIiUm2Uiqzym+AbK0Cqq4yaNDPEibPhmWmTnQVz0hUNa1kXJLzr3mqOPb3cbujbt981H89//v5MLo8ISLWYmsNn3dYQe+1n9cEKFLFQKWMozGKjlUBoRQWmre7AOx/5zHzuLSaMbR+OH9dFK0LV5PmgoNSNU9egeeC+VdRsbebIqm7sMayCkDxZa1FolAIRKVhDEMSMOImgS1gh466tiJ08TcghknYmTJjD3Llzg5hrGLffIad/+vGqaft1CTpes087v0esWdtkhWnoPeJ555ipJ1UoVSez0476hnHhGymgxeVsyq3tJzN/fWf5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" alt="" width="36" height="36" style="display:block;width:100%;height:100%;object-fit:contain"></span><span>ServiHogar</span></div>
+    <nav class="tabs" aria-label="Secciones">
+      <button class="tab" data-tab="pedir" aria-current="page">Pedir servicio</button>
+      <button class="tab" data-tab="planes">Planes</button>
+      <button class="tab" data-tab="equipo">Trabajadores</button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap" id="main">
+  <section id="view-pedir">
+    <div class="intro" id="intro">
+      <h1>¿Qué necesitas en casa?</h1>
+      <p>Elige el servicio, revisa el precio y escribe por WhatsApp. Precio claro antes de contratar.</p>
+    </div>
+    <ol class="stepper" id="stepper" aria-label="Progreso de la solicitud">
+      <li>Servicio</li><li>Detalles</li><li>Trabajador</li>
+    </ol>
+    <div id="step1"></div>
+    <div id="step2" hidden></div>
+    <div id="step3" hidden></div>
+  </section>
+
+  <section id="view-planes" hidden>
+    <h1 style="font-size:clamp(1.7rem,7vw,2.3rem)">Planes para servicio recurrente</h1>
+    <p class="sub" style="margin-top:8px">Si contratas de forma fija, pagas menos por visita y tienes prioridad en la agenda.</p>
+    <div id="planList"></div>
+  </section>
+
+  <section id="view-equipo" hidden>
+    <h1 style="font-size:clamp(1.7rem,7vw,2.3rem)">Trabajadores afiliados</h1>
+    <p class="sub" style="margin-top:8px">Escríbele directo al trabajador que necesites.</p>
+    <div class="filters" id="filters"></div>
+    <ul class="team" id="teamList"></ul>
+  </section>
+
+  <footer class="foot">
+    <p><strong>ServiHogar</strong>, Morales, Izabal.</p>
+    <p>Atención de lunes a sábado, de 8:00 a.m. a 5:00 p.m. No operamos los domingos.</p>
+  </footer>
+</main>
+
+<div class="bar" id="bar" hidden>
+  <div class="bar-in">
+    <div class="bar-info"><span class="bar-label" id="barLabel"></span><span class="bar-value" id="barValue"></span></div>
+    <button class="btn" id="barNext" type="button">Elegir trabajador</button>
+    <a class="btn wa" id="barSend" href="#" target="_blank" rel="noopener" hidden>Enviar por WhatsApp</a>
+  </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+/* ====== Configuración ======
+   Número de WhatsApp de ServiHogar (con código de país). Ejemplo: '50255551234'.
+   Si queda vacío, cada solicitud se envía directo al trabajador elegido. */
+var SERVIHOGAR_WA = '50473923';
+var MIN_VISIT = 100;
+
+var ICONS = {
+  sparkle:'<path d="M11 3l1.9 5.1L18 10l-5.1 1.9L11 17l-1.9-5.1L4 10l5.1-1.9z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/>',
+  leaf:'<path d="M12 21v-9"/><path d="M12 12c0-4.4 3.1-7.5 8-8 0 4.9-3.1 8-8 8z"/><path d="M12 15c0-3.3-2.4-5.7-6.5-6 0 3.6 2.4 6 6.5 6z"/>',
+  bolt:'<path d="M13 2L4.5 13.5H11L10 22l9-12h-6.5z"/>',
+  drop:'<path d="M12 3s6.5 6.6 6.5 11.2A6.5 6.5 0 0 1 5.5 14.2C5.5 9.6 12 3 12 3z"/>',
+  brick:'<rect x="3" y="5" width="18" height="14" rx="1"/><path d="M3 12h18M9 5v7M15 12v7"/>',
+  square:'<path d="M5 3v18h16v-5H10V3z"/>',
+  roller:'<rect x="4" y="3" width="13" height="5" rx="1"/><path d="M17 5.5h3V11h-8v3"/><rect x="10.5" y="14" width="3" height="7" rx="1"/>',
+  flame:'<path d="M12 3c.8 3.2 4.5 4.7 4.5 9a4.5 4.5 0 0 1-9 0c0-1.7.7-2.9 1.8-4 .3 1.4 1 2 1.7 2.3C10.7 8 11 5.7 12 3z"/><path d="M8 21h8"/>',
+  terrain:'<path d="M3 19l6-10 4 6 3-4 5 8z"/>',
+  back:'<path d="M15 5l-7 7 7 7"/>',
+  chat:'<path d="M21 12a8 8 0 0 1-11.8 7L4 20l1.2-4.4A8 8 0 1 1 21 12z"/>',
+  phone:'<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/>',
+  home:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h5v-6h4v6h5V10"/>'
+};
+function icon(n,s){s=s||22;return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+ICONS[n]+'</svg>';}
+
+/* ====== Datos ====== */
+var SERVICES = [
+  {id:'limpieza',name:'Limpieza',icon:'sparkle',mode:'area',hint:'Desde Q2.70 por m²',options:[
+    {id:'basica',label:'Limpieza básica',name:'Básica',rate:2.70,desc:'Limpieza general de interiores'},
+    {id:'profunda',label:'Limpieza profunda',name:'Profunda',rate:3.25,desc:'Limpieza a fondo de interiores'},
+    {id:'extrema',label:'Limpieza extrema',name:'Extrema',rate:5.00,desc:'Pisos, paredes y fachadas con hidrolavadora'}]},
+  {id:'jardineria',name:'Jardinería y chapeo',icon:'leaf',mode:'area',hint:'Desde Q1.75 por m²',options:[
+    {id:'jardin',label:'Mantenimiento de jardín',name:'Jardinería',rate:2.00,desc:'Chapeo y limpieza general del jardín'},
+    {id:'chapeo',label:'Chapeo de terreno',name:'Chapeo',rate:1.75,desc:'Corte de maleza en terrenos y áreas verdes grandes'}]},
+  {id:'electricidad',name:'Electricidad',icon:'bolt',mode:'fixed',hint:'Mínimo Q100 por visita',chips:['Cambiar tomacorriente o interruptor','Instalar lámpara','Revisar tablero','Falla o corto circuito']},
+  {id:'plomeria',name:'Plomería',icon:'drop',mode:'fixed',hint:'Mínimo Q100 por visita',chips:['Reparar fuga','Instalar lavamanos o inodoro','Destapar drenaje','Revisar tubería']},
+  {id:'albanileria',name:'Albañilería',icon:'brick',mode:'fixed',hint:'Mínimo Q100 por visita',chips:['Reparar pared','Levantar muro','Arreglar repello','Fundir piso']},
+  {id:'carpinteria',name:'Carpintería',icon:'square',mode:'fixed',hint:'Mínimo Q100 por visita',chips:['Reparar puerta','Hacer o arreglar mueble','Instalar repisas','Trabajo en madera']},
+  {id:'pintura',name:'Pintura',icon:'roller',mode:'fixed',hint:'Mínimo Q100 por visita',chips:['Pintar interiores','Pintar fachada','Retocar paredes','Pintar portón o reja']},
+  {id:'soldadura',name:'Soldadura y estructuras',icon:'flame',mode:'fixed',hint:'Mínimo Q100 por visita',chips:['Portón o reja','Barandal','Reparar estructura','Mesa o soporte metálico']},
+  {id:'nivelacion',name:'Nivelación de terreno',icon:'terrain',mode:'fixed',hint:'Mínimo Q100 por visita',chips:['Nivelar terreno','Preparar lote','Rellenar desnivel']}
+];
+
+var WORKERS = [
+  {n:'Selvin Castañeda',p:'54495800',t:['Jardinería'],s:['jardineria']},
+  {n:'Rolandon Castro',p:'46409393',t:['Jardinería'],s:['jardineria']},
+  {n:'Don Raúl',p:'59119615',t:['Jardinería'],s:['jardineria']},
+  {n:'Juan Gutiérrez',p:'49960442',t:['Jardinería'],s:['jardineria']},
+  {n:'Don Chico',p:'50664969',t:['Soldadura'],s:['soldadura']},
+  {n:'Alberto Caal',p:'59341350',t:['Electricidad'],s:['electricidad']},
+  {n:'Ronaldo Vasquez Barbas',p:'32998339',t:['Jardinería'],s:['jardineria']},
+  {n:'Pio Aldana',p:'49650218',t:['Plomería'],s:['plomeria']},
+  {n:'Marvin Chamale',p:'31256933',t:['Electricidad'],s:['electricidad']},
+  {n:'Eduardo Santizo',p:'50473923',t:['Carpintería','pintura','limpieza'],s:['carpinteria','pintura','limpieza']},
+  {n:'Don José',p:'49598702',t:['Chapeo','soldadura','estructuras básicas','electricidad'],s:['jardineria','soldadura','electricidad']},
+  {n:'Osman',p:'37739809',t:['Chapeo','nivelación de terrenos','fontanería básica'],s:['jardineria','nivelacion','plomeria']},
+  {n:'Chino Flores',p:'46621741',t:['Fontanería','albañilería'],s:['plomeria','albanileria']},
+  {n:'Oscar Ordóñez',p:'37055493',t:['Albañilería'],s:['albanileria']},
+  {n:'Juan José Ramos',p:'41261486',t:['Albañilería'],s:['albanileria']},
+  {n:'Bryan Acevedo',p:'58176962',t:['Electricidad'],s:['electricidad']},
+  {n:'Amner Pérez',p:'39503622',t:['Albañilería'],s:['albanileria']},
+  {n:'Jesús López',p:'47363767',t:['Electricidad'],s:['electricidad']}
+];
+
+var PLANS = [
+  {name:'Jardín Siempre Verde',sub:'Mantenimiento de jardín',freq:'Quincenal',price:340,per:'al mes',
+   about:'Chapeo y limpieza general del jardín cada quince días. Pensado para casas y condominios con área verde pequeña o mediana.',
+   cmp:'Sin plan pagarías Q400.00 al mes (2 visitas de Q200.00).',save:'Ahorras Q60.00 al mes',
+   facts:[['Frecuencia','2 visitas al mes'],['Área de referencia','Hasta 100 m²']],
+   perks:['Precio fijo mensual, sin importar si el pasto crece más un mes que otro.','Mismo trabajador asignado, que ya conoce el terreno.','Agenda prioritaria frente a clientes sin contrato.','Sin recargo por servicio urgente si se necesita mover la fecha.']},
+  {name:'Evento Impecable',sub:'Limpieza de salones de eventos',freq:'Cada sábado',price:3600,per:'al mes',
+   about:'Limpieza extrema después de cada evento del fin de semana. Turno fijo cada sábado en la noche o domingo temprano.',
+   cmp:'Sin plan pagarías Q4,000.00 al mes (4 visitas de Q1,000.00).',save:'Ahorras Q400.00 al mes',
+   facts:[['Frecuencia','4 visitas al mes'],['Área de referencia','200 m²'],['Tipo de limpieza','Extrema, Q5.00/m²']],
+   perks:['Turno fijo garantizado cada sábado, sin necesidad de pedir el servicio cada vez.','El salón queda listo antes del siguiente evento agendado.','Personal capacitado en limpieza post-evento (vidrio, piso, mobiliario).','Insumos de limpieza incluidos en el precio del plan.']},
+  {name:'Terreno Cuidado',sub:'Chapeo recurrente',freq:'Mensual',price:225,per:'al mes',
+   about:'Chapeo constante para terrenos, aldeas o propiedades con área verde grande, para que la maleza no se descontrole.',
+   cmp:'Sin plan pagarías Q262.50 por visita.',save:'Ahorras Q37.50 al mes',
+   facts:[['Frecuencia','1 visita al mes'],['Área de referencia','150 m²']],
+   perks:['El terreno nunca llega a un estado de maleza alta que cueste más limpiar.','Visita programada, sin depender de acordarse de llamar.','Precio protegido aunque suba la tarifa general de chapeo durante el año del contrato.']},
+  {name:'Hogar Seguro Eléctrico',sub:'Mantenimiento eléctrico preventivo',freq:'Trimestral',price:150,per:'por trimestre',
+   about:'Revisión general cada tres meses del tablero, los tomacorrientes y las conexiones visibles, para prevenir fallos antes de que pasen.',
+   cmp:'Además tienes 15% de descuento en cualquier reparación que se detecte en la revisión.',save:'',
+   facts:[['Frecuencia','1 revisión cada 3 meses']],
+   perks:['Detecta problemas eléctricos antes de que se vuelvan una emergencia.','Descuento automático si se necesita una reparación después de la revisión.','Prioridad de atención si surge una emergencia eléctrica entre revisiones.']}
+];
+
+/* ====== Utilidades ====== */
+function $(s,r){return (r||document).querySelector(s);}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function money(n){return 'Q'+(Math.round(n*100)/100).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',');}
+function digits(s){return String(s).replace(/\D/g,'');}
+function phoneFull(p){var d=digits(p);return d.length===8?'502'+d:d;}
+function waHref(phone,text){var d=phone?phoneFull(phone):'';return 'https://wa.me/'+d+'?text='+encodeURIComponent(text);}
+function todayStr(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function parseDate(v){var p=v.split('-');return new Date(+p[0],+p[1]-1,+p[2]);}
+function prettyDate(v){var d=parseDate(v);try{return d.toLocaleDateString('es-GT',{weekday:'long',day:'numeric',month:'long'});}catch(e){return v;}}
+function initials(n){var w=n.split(' ').filter(Boolean);return (w[0][0]+(w[1]?w[1][0]:'')).toUpperCase();}
+function hue(n){var H=[170,190,205,45,95,150],h=0;for(var i=0;i<n.length;i++)h=(h*31+n.charCodeAt(i))>>>0;return H[h%H.length];}
+function svcById(id){return SERVICES.filter(function(s){return s.id===id;})[0];}
+function workersFor(id){return WORKERS.filter(function(w){return w.s.indexOf(id)>-1;});}
+function workerByPhone(p){return WORKERS.filter(function(w){return w.p===p;})[0];}
+function cap(s){return s.charAt(0).toUpperCase()+s.slice(1);}
+
+/* ====== Estado ====== */
+var state={tab:'pedir',step:1,svc:null,opt:null,area:'',len:'',wid:'',chips:[],desc:'',name:'',zone:'',date:'',slot:'Cualquier hora',worker:null};
+var teamFilter='all';
+var STORE='servihogar:v1';
+try{var saved=JSON.parse(localStorage.getItem(STORE)||'{}');state.name=saved.name||'';state.zone=saved.zone||'';}catch(e){}
+function persist(){try{localStorage.setItem(STORE,JSON.stringify({name:state.name,zone:state.zone}));}catch(e){}}
+
+function svc(){return svcById(state.svc);}
+function opt(){var s=svc();return s&&s.options?s.options.filter(function(o){return o.id===state.opt;})[0]:null;}
+function quote(){
+  var s=svc();if(!s||s.mode!=='area')return null;
+  var a=parseFloat(state.area),o=opt();
+  if(!(a>0)||!o)return null;
+  var raw=Math.round(o.rate*a*100)/100;
+  return {raw:raw,total:Math.max(MIN_VISIT,raw),min:raw<MIN_VISIT,area:a,rate:o.rate};
+}
+function serviceLabel(){var s=svc(),o=opt();return o?o.label:s.name;}
+
+/* ====== Mensajes ====== */
+function requestMessage(){
+  var s=svc(),q=quote(),w=state.worker&&state.worker!=='any'?workerByPhone(state.worker):null;
+  var name=state.name.trim(),L=[];
+  if(w&&!SERVIHOGAR_WA) L.push('Hola '+w.n+', soy '+name+'. Te escribo desde ServiHogar.');
+  else L.push('Hola ServiHogar, soy '+name+'.');
+  L.push('Servicio: '+serviceLabel());
+  if(s.mode==='area'&&q){
+    L.push('Área: '+q.area+' m²');
+    L.push('Precio estimado: '+money(q.total)+(q.min?' (mínimo por visita)':''));
+  }else{
+    var job=state.chips.slice();
+    if(state.desc.trim())job.push(state.desc.trim());
+    L.push('Trabajo: '+job.join('. '));
+    L.push('Precio: tarifa fija según el trabajo, mínimo '+money(MIN_VISIT)+' por visita');
+  }
+  L.push('Ubicación: '+state.zone.trim());
+  if(state.date){L.push('Fecha preferida: '+prettyDate(state.date)+(state.slot!=='Cualquier hora'?', por la '+state.slot.toLowerCase():''));}
+  else if(state.slot!=='Cualquier hora'){L.push('Horario preferido: '+state.slot.toLowerCase());}
+  if(w&&SERVIHOGAR_WA)L.push('Trabajador de preferencia: '+w.n);
+  L.push(w&&!SERVIHOGAR_WA?'¿Estás disponible? Gracias.':'¿Me confirman disponibilidad y precio final? Gracias.');
+  return L.join('\n');
+}
+function requestTarget(){
+  var w=state.worker&&state.worker!=='any'?workerByPhone(state.worker):null;
+  if(w&&!SERVIHOGAR_WA)return w.p;
+  return SERVIHOGAR_WA;
+}
+
+/* ====== Navegación ====== */
+function showTab(t){
+  state.tab=t;
+  ['pedir','planes','equipo'].forEach(function(k){
+    $('#view-'+k).hidden=(k!==t);
+  });
+  document.querySelectorAll('.tab').forEach(function(b){
+    if(b.dataset.tab===t)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');
+  });
+  if(t==='planes')renderPlans();
+  updateBar();
+  window.scrollTo(0,0);
+}
+function go(step){
+  state.step=step;
+  $('#step1').hidden=step!==1;
+  $('#step2').hidden=step!==2;
+  $('#step3').hidden=step!==3;
+  $('#intro').hidden=step!==1;
+  if(step===2)buildStep2();
+  if(step===3)buildStep3();
+  Array.prototype.forEach.call($('#stepper').children,function(li,i){
+    var n=i+1;li.dataset.state=n<step?'done':(n===step?'now':'todo');
+    if(n===step)li.setAttribute('aria-current','step');else li.removeAttribute('aria-current');
+  });
+  updateBar();
+  window.scrollTo(0,0);
+}
+
+/* ====== Paso 1: servicios ====== */
+function renderTiles(){
+  $('#step1').innerHTML='<div class="tiles">'+SERVICES.map(function(s){
+    var n=workersFor(s.id).length;
+    return '<button class="tile" type="button" data-svc="'+s.id+'"><span class="ico">'+icon(s.icon,24)+'</span><span class="t-name">'+s.name+'</span><span class="t-hint">'+s.hint+'</span><span class="t-count">'+n+' trabajador'+(n>1?'es':'')+'</span></button>';
+  }).join('')+'</div>';
+}
+function pickService(id){
+  if(state.svc!==id){
+    state.svc=id;var s=svc();
+    state.opt=s.options?s.options[0].id:null;
+    state.chips=[];state.desc='';state.area='';state.len='';state.wid='';state.worker=null;
+  }
+  go(2);
+}
+
+/* ====== Paso 2: detalles ====== */
+function buildStep2(){
+  var s=svc(),h='';
+  h+='<button class="back" type="button" data-act="to1">'+icon('back',18)+' Cambiar servicio</button>';
+  h+='<h2 class="h-svc"><span class="ico">'+icon(s.icon,22)+'</span>'+s.name+'</h2>';
+  if(s.mode==='area'){
+    h+='<fieldset class="group"><legend>Tipo de servicio</legend>'+s.options.map(function(o){
+      return '<label class="opt"><input type="radio" name="opt" value="'+o.id+'"'+(state.opt===o.id?' checked':'')+'><span class="opt-body"><span class="opt-name">'+o.name+'</span><span class="opt-desc">'+o.desc+'</span></span><span class="opt-rate">'+money(o.rate)+'/m²</span></label>';
+    }).join('')+'</fieldset>';
+    h+='<div class="field"><label for="area">Área a atender</label><div class="unit"><input id="area" type="number" inputmode="decimal" min="0" step="any" placeholder="Ej. 80" value="'+esc(state.area)+'"><span>m²</span></div>';
+    h+='<button type="button" class="linkbtn" data-act="calc">¿No sabes los metros? Calcula largo por ancho</button>';
+    h+='<div class="calc" id="calc" hidden><div><label for="len">Largo (m)</label><input id="len" type="number" inputmode="decimal" min="0" step="any" value="'+esc(state.len)+'"></div><div><label for="wid">Ancho (m)</label><input id="wid" type="number" inputmode="decimal" min="0" step="any" value="'+esc(state.wid)+'"></div></div></div>';
+    h+='<div class="quote empty" id="quote" aria-live="polite"></div>';
+  }else{
+    h+='<div class="field" id="chips"><span class="lbl">¿Qué necesitas?</span><div class="chip-row">'+s.chips.map(function(c){
+      return '<button type="button" class="chip" data-chip="'+esc(c)+'" aria-pressed="'+(state.chips.indexOf(c)>-1)+'">'+c+'</button>';
+    }).join('')+'</div></div>';
+    h+='<div class="field"><label for="desc">Cuéntanos más <span class="opt-txt">(opcional)</span></label><textarea id="desc" rows="3" placeholder="Describe el trabajo con más detalle">'+esc(state.desc)+'</textarea></div>';
+    h+='<div class="note">Tarifa fija según el trabajo, con un mínimo de '+money(MIN_VISIT)+' por visita. El precio final se confirma por WhatsApp antes de agendar.</div>';
+  }
+  h+='<div class="field"><label for="name">Tu nombre</label><input id="name" type="text" autocomplete="name" value="'+esc(state.name)+'"></div>';
+  h+='<div class="field"><label for="zone">Colonia o dirección</label><input id="zone" type="text" autocomplete="street-address" placeholder="Ej. colonia, calle y una referencia" value="'+esc(state.zone)+'"></div>';
+  h+='<div class="field"><label for="date">Día preferido <span class="opt-txt">(opcional)</span></label><input id="date" type="date" min="'+todayStr()+'" value="'+esc(state.date)+'"><p class="hint">Lunes a sábado, de 8:00 a.m. a 5:00 p.m.</p></div>';
+  h+='<fieldset class="group"><legend>Horario preferido</legend><div class="seg">'+['Cualquier hora','Mañana','Tarde'].map(function(x){
+    return '<label><input type="radio" name="slot" value="'+x+'"'+(state.slot===x?' checked':'')+'>'+x+'</label>';
+  }).join('')+'</div></fieldset>';
+  h+='<p class="err" id="formError" role="alert"></p>';
+  $('#step2').innerHTML=h;
+  if(state.len||state.wid)$('#calc') && ($('#calc').hidden=false);
+  updateQuote();
+}
+function updateQuote(){
+  var box=$('#quote');if(!box)return;
+  var q=quote();
+  if(!q){box.className='quote empty';box.textContent='Escribe el área para ver el precio estimado.';return;}
+  box.className='quote';
+  box.innerHTML='<span class="q-label">Precio estimado</span><span class="q-num">'+money(q.total)+'</span><span class="q-calc">'+q.area+' m² × '+money(q.rate)+'/m²'+(q.min?' = '+money(q.raw)+'. Se aplica el mínimo de '+money(MIN_VISIT)+' por visita.':'')+'</span>';
+}
+function step2Error(){
+  var s=svc();
+  if(s.mode==='area'){
+    var a=parseFloat(state.area);
+    if(!(a>0))return {id:'area',msg:'Escribe el área en metros cuadrados.'};
+    if(a>50000)return {id:'area',msg:'Para áreas tan grandes, pide una cotización directa por WhatsApp.'};
+  }else if(!state.chips.length&&state.desc.trim().length<5){
+    return {id:'chips',msg:'Elige o describe el trabajo que necesitas.'};
+  }
+  if(state.name.trim().length<2)return {id:'name',msg:'Escribe tu nombre.'};
+  if(state.zone.trim().length<3)return {id:'zone',msg:'Indica tu colonia o dirección.'};
+  if(state.date){
+    if(state.date<todayStr())return {id:'date',msg:'Elige una fecha de hoy en adelante.'};
+    if(parseDate(state.date).getDay()===0)return {id:'date',msg:'ServiHogar no opera los domingos. Elige otro día.'};
+  }
+  return null;
+}
+function refresh2(){
+  updateQuote();updateBar();
+  var e=$('#formError');if(e)e.textContent='';
+}
+
+/* ====== Paso 3: trabajador ====== */
+function workerCard(w,checked){
+  return '<label class="worker"><input type="radio" name="worker" value="'+w.p+'"'+(checked?' checked':'')+'><span class="av" style="--h:'+hue(w.n)+'">'+initials(w.n)+'</span><span class="w-main"><strong>'+w.n+'</strong><span class="w-trades">'+cap(w.t.join(', '))+'</span></span></label>';
+}
+function buildStep3(){
+  var s=svc(),list=workersFor(s.id),h='';
+  h+='<button class="back" type="button" data-act="to2">'+icon('back',18)+' Cambiar detalles</button>';
+  h+='<h2 class="h-svc" style="margin-bottom:8px">¿Con quién quieres trabajar?</h2>';
+  h+='<p class="sub" style="margin-top:0">'+list.length+' trabajador'+(list.length>1?'es afiliados hacen':' afiliado hace')+' este servicio.</p>';
+  h+='<fieldset class="group" style="margin-bottom:0"><legend class="sr" style="position:absolute;left:-9999px">Trabajador</legend>';
+  if(SERVIHOGAR_WA){
+    h+='<label class="worker"><input type="radio" name="worker" value="any"'+(state.worker==='any'?' checked':'')+'><span class="av" style="--h:45">SH</span><span class="w-main"><strong>Que ServiHogar asigne a alguien</strong><span class="w-trades">Te asignamos un trabajador disponible en tu zona</span></span></label>';
+  }
+  h+=list.map(function(w){return workerCard(w,state.worker===w.p);}).join('');
+  h+='</fieldset>';
+  h+='<div class="preview" id="preview"></div>';
+  $('#step3').innerHTML=h;
+  updatePreview();
+}
+function updatePreview(){
+  var box=$('#preview');if(!box)return;
+  if(!state.worker){box.innerHTML='<p class="to">Elige un trabajador para ver el mensaje que se enviará.</p>';return;}
+  var w=state.worker!=='any'?workerByPhone(state.worker):null;
+  var dest=requestTarget()?(SERVIHOGAR_WA&&(!w||SERVIHOGAR_WA)?'ServiHogar':w.n):(w?w.n:'');
+  box.innerHTML='<h3>Mensaje por WhatsApp</h3><p class="to">Se enviará a '+esc(dest)+'.</p><pre id="msgText"></pre><button type="button" class="btn ghost full" data-act="copy">Copiar mensaje</button><p class="hint">Si WhatsApp no se abre, copia el mensaje y envíalo manualmente.</p>';
+  $('#msgText').textContent=requestMessage();
+}
+
+/* ====== Barra inferior ====== */
+function updateBar(){
+  var bar=$('#bar'),show=state.tab==='pedir'&&state.step>1&&state.svc;
+  bar.hidden=!show;
+  document.body.classList.toggle('has-bar',!!show);
+  if(!show)return;
+  var s=svc(),q=quote(),next=$('#barNext'),send=$('#barSend');
+  var price=q?money(q.total):(s.mode==='area'?'Sin calcular':'Desde '+money(MIN_VISIT));
+  if(state.step===2){
+    $('#barLabel').textContent=s.mode==='area'?'Precio estimado':'Precio';
+    $('#barValue').textContent=price;
+    next.hidden=false;send.hidden=true;
+    next.setAttribute('aria-disabled',String(!!step2Error()));
+  }else{
+    $('#barLabel').textContent=serviceLabel();
+    $('#barValue').textContent=price;
+    next.hidden=true;send.hidden=false;
+    var ok=!!state.worker;
+    send.setAttribute('aria-disabled',String(!ok));
+    send.href=ok?waHref(requestTarget(),requestMessage()):'#';
+    send.innerHTML=icon('chat',20)+' Enviar por WhatsApp';
+  }
+}
+
+/* ====== Planes ====== */
+function renderPlans(){
+  var who=state.name.trim();
+  $('#planList').innerHTML=PLANS.map(function(p){
+    var msg='Hola ServiHogar, '+(who?'soy '+who+'. ':'')+'Me interesa el plan '+p.name+' ('+money(p.price)+' '+p.per+'). ¿Me pueden dar más información?';
+    return '<article class="plan"><div class="plan-head"><h3>'+p.name+'</h3><span class="badge">'+p.freq+'</span></div>'+
+      '<p class="plan-sub">'+p.sub+'</p><p class="plan-about">'+p.about+'</p>'+
+      '<div class="plan-price"><span class="price">'+money(p.price)+'</span><span class="per">'+p.per+'</span></div>'+
+      '<p class="plan-cmp">'+p.cmp+(p.save?' <span class="save">'+p.save+'</span>':'')+'</p>'+
+      '<dl class="facts">'+p.facts.map(function(f){return '<div><dt>'+f[0]+'</dt><dd>'+f[1]+'</dd></div>';}).join('')+'</dl>'+
+      '<details><summary>Qué incluye</summary><ul>'+p.perks.map(function(x){return '<li>'+x+'</li>';}).join('')+'</ul></details>'+
+      '<a class="btn wa full" target="_blank" rel="noopener" href="'+waHref(SERVIHOGAR_WA,msg)+'">'+icon('chat',20)+' Consultar este plan</a></article>';
+  }).join('');
+}
+
+/* ====== Directorio ====== */
+function renderTeam(){
+  var f=[{id:'all',name:'Todos'}].concat(SERVICES.map(function(s){return {id:s.id,name:s.name};}));
+  $('#filters').innerHTML=f.map(function(x){
+    return '<button type="button" class="chip" data-filter="'+x.id+'" aria-pressed="'+(teamFilter===x.id)+'">'+x.name+'</button>';
+  }).join('');
+  var list=teamFilter==='all'?WORKERS:workersFor(teamFilter);
+  $('#teamList').innerHTML=list.map(function(w){
+    var msg='Hola '+w.n+', te escribo desde ServiHogar. Quisiera consultar por tus servicios.';
+    return '<li class="worker"><div class="w-row"><span class="av" style="--h:'+hue(w.n)+'">'+initials(w.n)+'</span><span class="w-main"><strong>'+w.n+'</strong><span class="w-trades">'+cap(w.t.join(', '))+'</span></span></div>'+
+      '<div class="w-actions"><a class="mini wa" target="_blank" rel="noopener" href="'+waHref(w.p,msg)+'">'+icon('chat',18)+' WhatsApp</a><a class="mini" href="tel:+'+phoneFull(w.p)+'">'+icon('phone',18)+' Llamar</a></div></li>';
+  }).join('');
+}
+
+/* ====== Eventos ====== */
+document.querySelector('.tabs').addEventListener('click',function(e){
+  var b=e.target.closest('[data-tab]');if(!b)return;
+  if(b.dataset.tab==='pedir'&&state.tab==='pedir'&&state.step!==1){go(1);return;}
+  showTab(b.dataset.tab);
+});
+$('#step1').addEventListener('click',function(e){
+  var t=e.target.closest('[data-svc]');if(t)pickService(t.dataset.svc);
+});
+var step2=$('#step2');
+step2.addEventListener('input',function(e){
+  var t=e.target;
+  switch(t.id){
+    case 'area':state.area=t.value;break;
+    case 'len':case 'wid':
+      state[t.id]=t.value;
+      var l=parseFloat(state.len),w=parseFloat(state.wid);
+      if(l>0&&w>0){state.area=String(Math.round(l*w*100)/100);$('#area').value=state.area;}
+      break;
+    case 'desc':state.desc=t.value;break;
+    case 'name':state.name=t.value;persist();break;
+    case 'zone':state.zone=t.value;persist();break;
+    case 'date':state.date=t.value;break;
+    default:return;
+  }
+  refresh2();
+});
+step2.addEventListener('change',function(e){
+  var t=e.target;
+  if(t.name==='opt')state.opt=t.value;
+  else if(t.name==='slot')state.slot=t.value;
+  else if(t.id==='date')state.date=t.value;
+  else return;
+  refresh2();
+});
+step2.addEventListener('click',function(e){
+  var c=e.target.closest('[data-chip]');
+  if(c){
+    var v=c.dataset.chip,i=state.chips.indexOf(v);
+    if(i>-1)state.chips.splice(i,1);else state.chips.push(v);
+    c.setAttribute('aria-pressed',String(i===-1));
+    refresh2();return;
+  }
+  var a=e.target.closest('[data-act]');if(!a)return;
+  if(a.dataset.act==='to1')go(1);
+  if(a.dataset.act==='calc'){var box=$('#calc');box.hidden=!box.hidden;}
+});
+var step3=$('#step3');
+step3.addEventListener('change',function(e){
+  if(e.target.name==='worker'){state.worker=e.target.value;updatePreview();updateBar();}
+});
+step3.addEventListener('click',function(e){
+  var a=e.target.closest('[data-act]');if(!a)return;
+  if(a.dataset.act==='to2')go(2);
+  if(a.dataset.act==='copy'){
+    var btn=a;
+    copyText(requestMessage()).then(function(ok){
+      btn.textContent=ok?'Mensaje copiado':'No se pudo copiar';
+      setTimeout(function(){btn.textContent='Copiar mensaje';},1800);
+    });
+  }
+});
+$('#barNext').addEventListener('click',function(){
+  var err=step2Error();
+  if(err){
+    $('#formError').textContent=err.msg;
+    var el=$('#'+err.id);
+    if(el){el.scrollIntoView({block:'center'});if(el.focus&&err.id!=='chips')el.focus({preventScroll:true});}
+    return;
+  }
+  go(3);
+});
+$('#barSend').addEventListener('click',function(e){
+  if(this.getAttribute('aria-disabled')==='true'){
+    e.preventDefault();
+    var p=$('#preview');if(p)p.scrollIntoView({block:'center'});
+  }
+});
+$('#filters').addEventListener('click',function(e){
+  var c=e.target.closest('[data-filter]');if(!c)return;
+  teamFilter=c.dataset.filter;renderTeam();
+});
+function copyText(t){
+  return new Promise(function(res){
+    try{
+      if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){res(true);},function(){res(fallback());});}
+      else res(fallback());
+    }catch(e){res(fallback());}
+    function fallback(){
+      try{var ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();var ok=document.execCommand('copy');ta.remove();return ok;}catch(e){return false;}
+    }
+  });
+}
+
+/* ====== Inicio ====== */
+renderTiles();renderTeam();renderPlans();
+go(1);
+})();
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('./service-worker.js').catch(function () {
+      /* si falla el registro, la app sigue funcionando normalmente en línea */
+    });
+  });
+}
+</script>
+</body>
+</html>
