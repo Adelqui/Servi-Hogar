@@ -1,0 +1,537 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>ServiHogar — Panel de administración</title>
+<link rel="icon" href="./icon-192.png" sizes="192x192" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,600..900&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F1F5F3; --surface:#FFFFFF; --ink:#10262B; --muted:#526569; --line:#D3DEDB;
+  --primary:#0D5A6B; --on-primary:#FFFFFF; --accent:#F5B21B; --on-accent:#2B2100;
+  --tint:#E0EEEC; --danger:#B3261E; --ok:#0E7C45; --focus:#0D5A6B;
+  --display:"Archivo","Arial Narrow","Helvetica Neue",Arial,sans-serif;
+  --body:"Figtree",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  color-scheme:light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0B1A1E; --surface:#122529; --ink:#E6F0EE; --muted:#9AB0B2; --line:#264146;
+    --primary:#5CC3D6; --on-primary:#062028; --accent:#F5B21B; --on-accent:#2B2100;
+    --tint:#173338; --danger:#FF8A80; --ok:#2DBE6C; --focus:#F5B21B;
+    color-scheme:dark;
+  }
+}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 1rem/1.5 var(--body);-webkit-text-size-adjust:100%}
+h1,h2,h3{font-family:var(--display);font-stretch:108%;font-weight:800;line-height:1.15;letter-spacing:-.01em;margin:0}
+p{margin:0}
+button{font:inherit;color:inherit}
+input,textarea,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.wrap{max-width:760px;margin:0 auto;padding:0 16px 120px}
+[hidden]{display:none!important}
+
+/* Login */
+.login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+.login-card{width:100%;max-width:360px;background:var(--surface);border:1.5px solid var(--line);border-radius:18px;padding:28px 24px}
+.login-mark{width:56px;height:56px;margin:0 auto 16px;display:block}
+.login-card h1{font-size:1.5rem;text-align:center;margin-bottom:6px}
+.login-sub{color:var(--muted);text-align:center;font-size:.92rem;margin-bottom:22px}
+.pw-row{position:relative;margin-bottom:14px}
+.pw-row input{width:100%;min-height:50px;padding:10px 46px 10px 14px;border:1.5px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);font-size:1.05rem}
+.pw-row input:focus{border-color:var(--primary)}
+.pw-toggle{position:absolute;right:6px;top:6px;bottom:6px;width:38px;background:none;border:0;color:var(--muted);cursor:pointer;display:grid;place-items:center}
+.login-err{color:var(--danger);font-size:.88rem;min-height:1.3em;margin-bottom:8px}
+.login-note{color:var(--muted);font-size:.8rem;text-align:center;margin-top:16px;line-height:1.4}
+
+/* Top bar */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1px solid var(--line)}
+.top-in{max-width:760px;margin:0 auto;padding:0 16px;display:flex;align-items:center;gap:10px;height:58px}
+.top-title{font-family:var(--display);font-weight:800;font-stretch:110%;font-size:1.1rem;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.icon-btn{background:none;border:1.5px solid var(--line);border-radius:10px;min-height:40px;padding:0 12px;color:var(--ink);font-weight:600;font-size:.88rem;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.tabs{display:flex;gap:2px;overflow-x:auto;max-width:760px;margin:0 auto;padding:0 16px}
+.tab{flex:none;background:none;border:0;border-bottom:3px solid transparent;padding:10px 12px 11px;font-weight:600;font-size:.92rem;color:var(--muted);cursor:pointer;white-space:nowrap}
+.tab[aria-current="page"]{color:var(--ink);border-bottom-color:var(--accent)}
+
+main{padding-top:20px}
+.status{display:flex;align-items:center;gap:10px;padding:14px;border-radius:12px;background:var(--tint);margin-bottom:18px;font-size:.92rem}
+.status.err{background:#FBEAE8;color:#6E1712}
+@media (prefers-color-scheme:dark){.status.err{background:#3A1512;color:#FFB4AA}}
+.status.ok{background:var(--tint)}
+
+section.panel{margin-bottom:28px}
+section.panel h2{font-size:1.2rem;margin-bottom:4px}
+.panel-hint{color:var(--muted);font-size:.88rem;margin-bottom:16px}
+.field{margin-bottom:16px}
+.field label{display:block;font-weight:700;font-size:.9rem;margin-bottom:6px}
+.field .desc{color:var(--muted);font-size:.82rem;margin-top:4px}
+input[type=text],input[type=number],input[type=tel],textarea{width:100%;min-height:46px;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);font-size:.98rem}
+textarea{resize:vertical;min-height:80px;line-height:1.5}
+input:focus,textarea:focus{border-color:var(--primary)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:480px){.grid2{grid-template-columns:1fr}}
+
+.rate-card{background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.rate-card h3{font-size:1.02rem;margin-bottom:2px}
+.rate-card .svc-hint{color:var(--muted);font-size:.85rem;margin-bottom:12px}
+.rate-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.rate-row:last-child{margin-bottom:0}
+.rate-row label{flex:1;font-size:.92rem;font-weight:600}
+.rate-row .unit-field{width:120px;flex:none;position:relative}
+.rate-row .unit-field input{padding-right:44px;text-align:right}
+.rate-row .unit-field span{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:.85rem;pointer-events:none}
+.chips-field textarea{font-size:.92rem}
+
+.worker-card{background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px;position:relative}
+.worker-card .del{position:absolute;top:12px;right:12px;background:none;border:0;color:var(--danger);font-weight:700;font-size:.85rem;cursor:pointer;padding:6px}
+.svc-check-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.svc-check{display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--line);border-radius:999px;padding:6px 12px 6px 8px;font-size:.85rem;cursor:pointer}
+.svc-check input{accent-color:var(--primary);width:16px;height:16px;margin:0}
+.svc-check:has(input:checked){background:var(--tint);border-color:var(--primary)}
+
+.plan-card{background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:16px;margin-bottom:16px}
+.plan-card h3{font-size:1.05rem;margin-bottom:12px}
+
+.add-btn{display:inline-flex;align-items:center;gap:8px;min-height:46px;padding:0 18px;border-radius:10px;border:1.5px dashed var(--primary);background:none;color:var(--primary);font-weight:700;font-size:.95rem;cursor:pointer;width:100%;justify-content:center}
+
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--surface);border-top:1px solid var(--line);padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px))}
+.bar-in{max-width:760px;margin:0 auto;display:flex;gap:10px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 18px;border-radius:12px;border:0;background:var(--primary);color:var(--on-primary);font-weight:700;font-size:.98rem;cursor:pointer;flex:1}
+.btn.ghost{background:transparent;color:var(--primary);border:1.5px solid var(--primary);flex:none}
+.btn:disabled{opacity:.5}
+.toast{position:fixed;left:16px;right:16px;bottom:86px;z-index:40;background:var(--ink);color:var(--bg);border-radius:12px;padding:14px 16px;font-size:.92rem;text-align:center;transition:opacity .25s, transform .25s}
+.toast[hidden]{opacity:0;transform:translateY(8px);pointer-events:none}
+@media (prefers-color-scheme:dark){.toast{background:var(--surface);border:1.5px solid var(--line);color:var(--ink)}}
+.spin{width:18px;height:18px;border-radius:50%;border:2.5px solid currentColor;border-right-color:transparent;animation:spin .7s linear infinite;flex:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.spin{animation:none}}
+</style>
+</head>
+<body>
+
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <svg class="login-mark" viewBox="0 0 24 24" fill="none" stroke="#0D5A6B" stroke-width="1.6" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h5v-6h4v6h5V10"/></svg>
+    <h1>Panel de administración</h1>
+    <p class="login-sub">ServiHogar</p>
+    <form id="loginForm" autocomplete="off">
+      <div class="pw-row">
+        <input id="pwInput" type="password" placeholder="Contraseña" autocomplete="current-password" autofocus>
+        <button type="button" class="pw-toggle" id="pwToggle" aria-label="Mostrar contraseña">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
+      <p class="login-err" id="loginErr" role="alert"></p>
+      <button type="submit" class="btn full" style="width:100%">Entrar</button>
+    </form>
+    <p class="login-note">Panel privado para editar precios, trabajadores y planes. No compartas la contraseña públicamente.</p>
+  </div>
+</div>
+
+<div id="app" hidden>
+  <header class="top">
+    <div class="top-in">
+      <span class="top-title">Panel — ServiHogar</span>
+      <button class="icon-btn" id="logoutBtn" type="button">Salir</button>
+    </div>
+    <nav class="tabs" aria-label="Secciones del panel">
+      <button class="tab" data-tab="general" aria-current="page">General</button>
+      <button class="tab" data-tab="precios">Precios</button>
+      <button class="tab" data-tab="trabajadores">Trabajadores</button>
+      <button class="tab" data-tab="planes">Planes</button>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <div id="statusBox" class="status">
+      <div class="spin"></div>
+      <span>Cargando los datos actuales desde index.html…</span>
+    </div>
+
+    <div id="editor" hidden>
+      <section class="panel" id="tab-general">
+        <h2>Datos generales</h2>
+        <p class="panel-hint">El número de WhatsApp que recibe todas las solicitudes, y el cobro mínimo por visita.</p>
+        <div class="field">
+          <label for="waNumber">Número de WhatsApp central</label>
+          <input id="waNumber" type="tel" placeholder="Ej. 50473923">
+          <p class="desc">Con código de país (502) o sin él si es un número guatemalteco de 8 dígitos.</p>
+        </div>
+        <div class="field">
+          <label for="minVisit">Cobro mínimo por visita (Q)</label>
+          <input id="minVisit" type="number" min="0" step="1">
+          <p class="desc">Se aplica a limpieza, jardinería y a todos los servicios de tarifa fija.</p>
+        </div>
+      </section>
+
+      <section class="panel" id="tab-precios" hidden>
+        <h2>Precios</h2>
+        <p class="panel-hint">Tarifas por metro cuadrado y las opciones rápidas de cada servicio de tarifa fija.</p>
+        <div id="ratesList"></div>
+      </section>
+
+      <section class="panel" id="tab-trabajadores" hidden>
+        <h2>Trabajadores</h2>
+        <p class="panel-hint">Nombre, teléfono y los servicios en los que aparece cada trabajador.</p>
+        <div id="workersList"></div>
+        <button class="add-btn" id="addWorkerBtn" type="button">+ Agregar trabajador</button>
+      </section>
+
+      <section class="panel" id="tab-planes" hidden>
+        <h2>Planes recurrentes</h2>
+        <p class="panel-hint">Los 4 planes de contrato que se muestran en la pestaña Planes.</p>
+        <div id="plansList"></div>
+      </section>
+    </div>
+  </main>
+
+  <div class="bar">
+    <div class="bar-in">
+      <button class="btn ghost" id="resetBtn" type="button">Deshacer</button>
+      <button class="btn" id="downloadBtn" type="button" disabled>Descargar index.html actualizado</button>
+    </div>
+  </div>
+  <div class="toast" id="toast" hidden></div>
+</div>
+
+<script>
+(function(){
+'use strict';
+var PASSWORD_HASH = '5780480096849abee90181d49389a8e9c77e84a26b18f249085c009302df340b';
+
+function $(s,r){return (r||document).querySelector(s);}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+
+async function sha256Hex(text){
+  var enc = new TextEncoder().encode(text);
+  var buf = await crypto.subtle.digest('SHA-256', enc);
+  var bytes = Array.from(new Uint8Array(buf));
+  return bytes.map(function(b){return b.toString(16).padStart(2,'0');}).join('');
+}
+
+/* ====== Login ====== */
+var loginForm = $('#loginForm'), pwInput = $('#pwInput'), loginErr = $('#loginErr');
+$('#pwToggle').addEventListener('click', function(){
+  pwInput.type = pwInput.type === 'password' ? 'text' : 'password';
+});
+loginForm.addEventListener('submit', async function(e){
+  e.preventDefault();
+  loginErr.textContent = '';
+  var val = pwInput.value;
+  if(!val){ loginErr.textContent = 'Escribe la contraseña.'; return; }
+  var hash;
+  try{ hash = await sha256Hex(val); }
+  catch(err){ loginErr.textContent = 'Este navegador no soporta el inicio de sesión seguro. Prueba con Chrome o Safari actualizado.'; return; }
+  if(hash === PASSWORD_HASH){
+    sessionStorage.setItem('servihogar_admin_ok','1');
+    enterApp();
+  }else{
+    loginErr.textContent = 'Contraseña incorrecta.';
+    pwInput.value='';
+    pwInput.focus();
+  }
+});
+if(sessionStorage.getItem('servihogar_admin_ok') === '1'){
+  enterApp();
+}
+
+function enterApp(){
+  $('#loginScreen').hidden = true;
+  $('#app').hidden = false;
+  loadData();
+}
+$('#logoutBtn').addEventListener('click', function(){
+  sessionStorage.removeItem('servihogar_admin_ok');
+  location.reload();
+});
+
+/* ====== Tabs ====== */
+document.querySelector('.tabs').addEventListener('click', function(e){
+  var b = e.target.closest('[data-tab]'); if(!b) return;
+  document.querySelectorAll('.tab').forEach(function(t){
+    if(t===b) t.setAttribute('aria-current','page'); else t.removeAttribute('aria-current');
+  });
+  ['general','precios','trabajadores','planes'].forEach(function(k){
+    $('#tab-'+k).hidden = (b.dataset.tab !== k);
+  });
+  window.scrollTo(0,0);
+});
+
+/* ====== Estado de datos ====== */
+var RAW_HTML = '';       // texto completo del index.html cargado
+var DATA = null;         // { wa, minVisit, services, workers, plans }
+var ORIGINAL = null;      // copia de respaldo para "Deshacer"
+
+function evalBlock(html, varName){
+  var re = new RegExp('var\\s+'+varName+'\\s*=\\s*(\\[[\\s\\S]*?\\]);');
+  var m = html.match(re);
+  if(!m) throw new Error('No encontré "'+varName+'" en el archivo.');
+  return { value: new Function('return ' + m[1])(), raw: m[0], inner: m[1] };
+}
+function evalString(html, varName){
+  var re = new RegExp("var\\s+"+varName+"\\s*=\\s*'([^']*)';");
+  var m = html.match(re);
+  if(!m) throw new Error('No encontré "'+varName+'" en el archivo.');
+  return { value: m[1], raw: m[0] };
+}
+function evalNumber(html, varName){
+  var re = new RegExp('var\\s+'+varName+'\\s*=\\s*(\\d+(?:\\.\\d+)?);');
+  var m = html.match(re);
+  if(!m) throw new Error('No encontré "'+varName+'" en el archivo.');
+  return { value: parseFloat(m[1]), raw: m[0] };
+}
+
+async function loadData(){
+  var box = $('#statusBox');
+  box.className = 'status';
+  box.innerHTML = '<div class="spin"></div><span>Cargando los datos actuales desde index.html…</span>';
+  try{
+    var res = await fetch('./index.html', {cache:'no-store'});
+    if(!res.ok) throw new Error('No se pudo abrir index.html (código ' + res.status + ').');
+    RAW_HTML = await res.text();
+
+    var services = evalBlock(RAW_HTML, 'SERVICES').value;
+    var workers = evalBlock(RAW_HTML, 'WORKERS').value;
+    var plans = evalBlock(RAW_HTML, 'PLANS').value;
+    var wa = evalString(RAW_HTML, 'SERVIHOGAR_WA').value;
+    var minVisit = evalNumber(RAW_HTML, 'MIN_VISIT').value;
+
+    DATA = { wa: wa, minVisit: minVisit, services: services, workers: workers, plans: plans };
+    ORIGINAL = JSON.parse(JSON.stringify(DATA));
+
+    box.hidden = true;
+    $('#editor').hidden = false;
+    $('#downloadBtn').disabled = false;
+    renderAll();
+  }catch(err){
+    box.className = 'status err';
+    box.innerHTML = '<div><strong>No pude cargar los datos.</strong><br>' + esc(err.message) +
+      '<br><br>Este panel necesita estar en la misma carpeta que <code>index.html</code>, en el sitio ya publicado ' +
+      '(por ejemplo <code>https://tu-usuario.github.io/tu-repo/admin.html</code>). No funciona si abres el archivo directo desde tu computadora.</div>';
+  }
+}
+
+$('#resetBtn').addEventListener('click', function(){
+  if(!ORIGINAL) return;
+  if(!confirm('¿Deshacer todos los cambios sin guardar?')) return;
+  DATA = JSON.parse(JSON.stringify(ORIGINAL));
+  renderAll();
+  showToast('Cambios deshechos.');
+});
+
+/* ====== Render: General ====== */
+function renderAll(){
+  $('#waNumber').value = DATA.wa;
+  $('#minVisit').value = DATA.minVisit;
+  renderRates();
+  renderWorkers();
+  renderPlans();
+}
+$('#waNumber').addEventListener('input', function(){ DATA.wa = this.value.trim(); });
+$('#minVisit').addEventListener('input', function(){
+  var v = parseFloat(this.value);
+  DATA.minVisit = isNaN(v) ? 0 : v;
+  renderRates(); // los textos "mínimo Qxxx" dependen de este valor
+});
+
+/* ====== Render: Precios ====== */
+function renderRates(){
+  var el = $('#ratesList');
+  el.innerHTML = DATA.services.map(function(svc, si){
+    if(svc.mode === 'area'){
+      return '<div class="rate-card"><h3>' + esc(svc.name) + '</h3>' +
+        '<p class="svc-hint">Precio por metro cuadrado, según el tipo de servicio.</p>' +
+        svc.options.map(function(opt, oi){
+          return '<div class="rate-row"><label>' + esc(opt.name) + '</label>' +
+            '<div class="unit-field"><input type="number" min="0" step="0.05" value="' + opt.rate + '" data-svc="' + si + '" data-opt="' + oi + '"><span>Q/m²</span></div></div>';
+        }).join('') + '</div>';
+    }else{
+      return '<div class="rate-card"><h3>' + esc(svc.name) + '</h3>' +
+        '<p class="svc-hint">Tarifa fija, con el mínimo general de Q' + DATA.minVisit + ' por visita. Opciones rápidas que ve el cliente:</p>' +
+        '<div class="chips-field"><textarea rows="4" data-chips="' + si + '">' + esc(svc.chips.join('\n')) + '</textarea></div></div>';
+    }
+  }).join('');
+  el.querySelectorAll('input[data-svc]').forEach(function(inp){
+    inp.addEventListener('input', function(){
+      var si = +this.dataset.svc, oi = +this.dataset.opt;
+      var v = parseFloat(this.value);
+      DATA.services[si].options[oi].rate = isNaN(v) ? 0 : v;
+    });
+  });
+  el.querySelectorAll('textarea[data-chips]').forEach(function(ta){
+    ta.addEventListener('input', function(){
+      var si = +this.dataset.chips;
+      DATA.services[si].chips = this.value.split('\n').map(function(s){return s.trim();}).filter(Boolean);
+    });
+  });
+}
+
+/* ====== Render: Trabajadores ====== */
+function renderWorkers(){
+  var el = $('#workersList');
+  el.innerHTML = DATA.workers.map(function(w, wi){
+    return '<div class="worker-card" data-wi="'+wi+'">' +
+      '<button class="del" type="button" data-del-worker="'+wi+'">Eliminar</button>' +
+      '<div class="field"><label>Nombre</label><input type="text" data-wf="n" value="'+esc(w.n)+'"></div>' +
+      '<div class="field"><label>Teléfono</label><input type="tel" data-wf="p" value="'+esc(w.p)+'"></div>' +
+      '<div class="field"><label>Oficios (como se muestran, separados por coma)</label><input type="text" data-wf="t" value="'+esc(w.t.join(', '))+'"></div>' +
+      '<div class="field"><label>Aparece en estos servicios</label><div class="svc-check-grid">' +
+      DATA.services.map(function(svc){
+        var checked = w.s.indexOf(svc.id) > -1;
+        return '<label class="svc-check"><input type="checkbox" data-ws="'+svc.id+'"'+(checked?' checked':'')+'>'+esc(svc.name)+'</label>';
+      }).join('') + '</div></div>' +
+      '</div>';
+  }).join('') || '<p class="panel-hint">Todavía no hay trabajadores. Agrega el primero abajo.</p>';
+
+  el.querySelectorAll('.worker-card').forEach(function(card){
+    var wi = +card.dataset.wi;
+    card.querySelector('[data-wf="n"]').addEventListener('input', function(){ DATA.workers[wi].n = this.value; });
+    card.querySelector('[data-wf="p"]').addEventListener('input', function(){ DATA.workers[wi].p = this.value.trim(); });
+    card.querySelector('[data-wf="t"]').addEventListener('input', function(){
+      DATA.workers[wi].t = this.value.split(',').map(function(s){return s.trim();}).filter(Boolean);
+    });
+    card.querySelectorAll('[data-ws]').forEach(function(cb){
+      cb.addEventListener('change', function(){
+        var sid = this.dataset.ws;
+        var arr = DATA.workers[wi].s;
+        var idx = arr.indexOf(sid);
+        if(this.checked && idx === -1) arr.push(sid);
+        if(!this.checked && idx > -1) arr.splice(idx,1);
+      });
+    });
+  });
+  el.querySelectorAll('[data-del-worker]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var wi = +this.dataset.delWorker;
+      if(!confirm('¿Eliminar a "'+(DATA.workers[wi].n || 'este trabajador')+'"?')) return;
+      DATA.workers.splice(wi,1);
+      renderWorkers();
+    });
+  });
+}
+$('#addWorkerBtn').addEventListener('click', function(){
+  DATA.workers.push({ n:'', p:'', t:[], s:[] });
+  renderWorkers();
+  var cards = document.querySelectorAll('.worker-card');
+  var last = cards[cards.length-1];
+  if(last){ last.scrollIntoView({behavior:'smooth', block:'center'}); var f = last.querySelector('[data-wf="n"]'); if(f) f.focus(); }
+});
+
+/* ====== Render: Planes ====== */
+function renderPlans(){
+  var el = $('#plansList');
+  el.innerHTML = DATA.plans.map(function(p, pi){
+    var factsText = p.facts.map(function(f){ return f[0] + ': ' + f[1]; }).join('\n');
+    var perksText = p.perks.join('\n');
+    return '<div class="plan-card" data-pi="'+pi+'">' +
+      '<h3>' + esc(p.name || 'Plan sin nombre') + '</h3>' +
+      '<div class="field"><label>Nombre del plan</label><input type="text" data-pf="name" value="'+esc(p.name)+'"></div>' +
+      '<div class="field"><label>Subtítulo</label><input type="text" data-pf="sub" value="'+esc(p.sub)+'"></div>' +
+      '<div class="grid2">' +
+        '<div class="field"><label>Frecuencia (insignia)</label><input type="text" data-pf="freq" value="'+esc(p.freq)+'"></div>' +
+        '<div class="field"><label>Precio (Q)</label><input type="number" min="0" step="1" data-pf="price" value="'+p.price+'"></div>' +
+      '</div>' +
+      '<div class="field"><label>Texto junto al precio (ej. "al mes")</label><input type="text" data-pf="per" value="'+esc(p.per)+'"></div>' +
+      '<div class="field"><label>Descripción</label><textarea rows="3" data-pf="about">'+esc(p.about)+'</textarea></div>' +
+      '<div class="field"><label>Comparación con pago por visita</label><input type="text" data-pf="cmp" value="'+esc(p.cmp)+'"></div>' +
+      '<div class="field"><label>Insignia de ahorro (opcional, ej. "Ahorras Q60.00 al mes")</label><input type="text" data-pf="save" value="'+esc(p.save)+'"></div>' +
+      '<div class="field"><label>Datos rápidos (uno por línea, "Etiqueta: Valor")</label><textarea rows="3" data-pf="facts">'+esc(factsText)+'</textarea></div>' +
+      '<div class="field"><label>Qué incluye (un beneficio por línea)</label><textarea rows="4" data-pf="perks">'+esc(perksText)+'</textarea></div>' +
+      '</div>';
+  }).join('');
+
+  el.querySelectorAll('.plan-card').forEach(function(card){
+    var pi = +card.dataset.pi;
+    card.querySelectorAll('[data-pf]').forEach(function(input){
+      input.addEventListener('input', function(){
+        var key = this.dataset.pf;
+        if(key === 'price'){
+          var v = parseFloat(this.value); DATA.plans[pi].price = isNaN(v) ? 0 : v;
+        }else if(key === 'facts'){
+          DATA.plans[pi].facts = this.value.split('\n').map(function(line){
+            var idx = line.indexOf(':');
+            if(idx === -1) return null;
+            return [line.slice(0,idx).trim(), line.slice(idx+1).trim()];
+          }).filter(Boolean);
+        }else if(key === 'perks'){
+          DATA.plans[pi].perks = this.value.split('\n').map(function(s){return s.trim();}).filter(Boolean);
+        }else{
+          DATA.plans[pi][key] = this.value;
+        }
+        if(key === 'name'){ card.querySelector('h3').textContent = this.value || 'Plan sin nombre'; }
+      });
+    });
+  });
+}
+
+/* ====== Generar y descargar index.html actualizado ====== */
+function jsLiteral(value){
+  // JSON es un subconjunto válido de JS: sirve como literal de array/objeto en el archivo.
+  return JSON.stringify(value, null, 2);
+}
+function recomputeHints(services, minVisit){
+  return services.map(function(svc){
+    var copy = Object.assign({}, svc);
+    if(svc.mode === 'area'){
+      var min = Math.min.apply(null, svc.options.map(function(o){return o.rate;}));
+      copy.hint = 'Desde Q' + rateNum(min) + ' por m²';
+    }else{
+      copy.hint = 'Mínimo Q' + wholeNum(minVisit) + ' por visita';
+    }
+    return copy;
+  });
+}
+function rateNum(n){
+  return (Math.round(n*100)/100).toFixed(2);
+}
+function wholeNum(n){
+  var r = Math.round(n*100)/100;
+  return Number.isInteger(r) ? String(r) : String(r);
+}
+
+$('#downloadBtn').addEventListener('click', function(){
+  if(!DATA || !RAW_HTML) return;
+  try{
+    var servicesOut = recomputeHints(DATA.services, DATA.minVisit);
+    var html = RAW_HTML;
+
+    html = html.replace(evalBlock(RAW_HTML,'SERVICES').raw, 'var SERVICES = ' + jsLiteral(servicesOut) + ';');
+    html = html.replace(evalBlock(RAW_HTML,'WORKERS').raw, 'var WORKERS = ' + jsLiteral(DATA.workers) + ';');
+    html = html.replace(evalBlock(RAW_HTML,'PLANS').raw, 'var PLANS = ' + jsLiteral(DATA.plans) + ';');
+    html = html.replace(evalString(RAW_HTML,'SERVIHOGAR_WA').raw, "var SERVIHOGAR_WA = '" + DATA.wa.replace(/'/g,"") + "';");
+    html = html.replace(evalNumber(RAW_HTML,'MIN_VISIT').raw, 'var MIN_VISIT = ' + DATA.minVisit + ';');
+
+    var blob = new Blob([html], {type:'text/html'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = 'index.html';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+
+    ORIGINAL = JSON.parse(JSON.stringify(DATA));
+    showToast('Descargado. Súbelo a GitHub reemplazando el index.html actual.');
+  }catch(err){
+    showToast('No se pudo generar el archivo: ' + err.message);
+  }
+});
+
+var toastTimer = null;
+function showToast(msg){
+  var t = $('#toast');
+  t.textContent = msg;
+  t.hidden = false;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ t.hidden = true; }, 4200);
+}
+})();
+</script>
+</body>
+</html>
