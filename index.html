@@ -268,64 +268,452 @@ function icon(n,s){s=s||22;return '<svg width="'+s+'" height="'+s+'" viewBox="0 
 
 /* ====== Datos ====== */
 var SERVICES = [
-  {id:'limpieza',name:'Limpieza',icon:'sparkle',mode:'area',hint:'Desde Q2.70 por m²',options:[
-    {id:'basica',label:'Limpieza básica',name:'Básica',rate:2.70,desc:'Limpieza general de interiores'},
-    {id:'profunda',label:'Limpieza profunda',name:'Profunda',rate:3.25,desc:'Limpieza a fondo de interiores'},
-    {id:'extrema',label:'Limpieza extrema',name:'Extrema',rate:5.00,desc:'Pisos, paredes y fachadas con hidrolavadora'}]},
-  {id:'jardineria',name:'Jardinería y chapeo',icon:'leaf',mode:'area',hint:'Desde Q1.75 por m²',options:[
-    {id:'jardin',label:'Mantenimiento de jardín',name:'Jardinería',rate:2.00,desc:'Chapeo y limpieza general del jardín'},
-    {id:'chapeo',label:'Chapeo de terreno',name:'Chapeo',rate:1.75,desc:'Corte de maleza en terrenos y áreas verdes grandes'}]},
-  {id:'electricidad',name:'Electricidad',icon:'bolt',mode:'fixed',hint:'Mínimo Q100 por visita',chips:['Cambiar tomacorriente o interruptor','Instalar lámpara','Revisar tablero','Falla o corto circuito']},
-  {id:'plomeria',name:'Plomería',icon:'drop',mode:'fixed',hint:'Mínimo Q100 por visita',chips:['Reparar fuga','Instalar lavamanos o inodoro','Destapar drenaje','Revisar tubería']},
-  {id:'albanileria',name:'Albañilería',icon:'brick',mode:'fixed',hint:'Mínimo Q100 por visita',chips:['Reparar pared','Levantar muro','Arreglar repello','Fundir piso']},
-  {id:'carpinteria',name:'Carpintería',icon:'square',mode:'fixed',hint:'Mínimo Q100 por visita',chips:['Reparar puerta','Hacer o arreglar mueble','Instalar repisas','Trabajo en madera']},
-  {id:'pintura',name:'Pintura',icon:'roller',mode:'fixed',hint:'Mínimo Q100 por visita',chips:['Pintar interiores','Pintar fachada','Retocar paredes','Pintar portón o reja']},
-  {id:'soldadura',name:'Soldadura y estructuras',icon:'flame',mode:'fixed',hint:'Mínimo Q100 por visita',chips:['Portón o reja','Barandal','Reparar estructura','Mesa o soporte metálico']},
-  {id:'nivelacion',name:'Nivelación de terreno',icon:'terrain',mode:'fixed',hint:'Mínimo Q100 por visita',chips:['Nivelar terreno','Preparar lote','Rellenar desnivel']}
+  {
+    "id": "limpieza",
+    "name": "Limpieza",
+    "icon": "sparkle",
+    "mode": "area",
+    "hint": "Desde Q2.70 por m²",
+    "options": [
+      {
+        "id": "basica",
+        "label": "Limpieza básica",
+        "name": "Básica",
+        "rate": 2.7,
+        "desc": "Limpieza general de interiores"
+      },
+      {
+        "id": "profunda",
+        "label": "Limpieza profunda",
+        "name": "Profunda",
+        "rate": 3.25,
+        "desc": "Limpieza a fondo de interiores"
+      },
+      {
+        "id": "extrema",
+        "label": "Limpieza extrema",
+        "name": "Extrema",
+        "rate": 5,
+        "desc": "Pisos, paredes y fachadas con hidrolavadora"
+      }
+    ]
+  },
+  {
+    "id": "jardineria",
+    "name": "Jardinería y chapeo",
+    "icon": "leaf",
+    "mode": "area",
+    "hint": "Desde Q1.75 por m²",
+    "options": [
+      {
+        "id": "jardin",
+        "label": "Mantenimiento de jardín",
+        "name": "Jardinería",
+        "rate": 2,
+        "desc": "Chapeo y limpieza general del jardín"
+      },
+      {
+        "id": "chapeo",
+        "label": "Chapeo de terreno",
+        "name": "Chapeo",
+        "rate": 1.75,
+        "desc": "Corte de maleza en terrenos y áreas verdes grandes"
+      }
+    ]
+  },
+  {
+    "id": "electricidad",
+    "name": "Electricidad",
+    "icon": "bolt",
+    "mode": "fixed",
+    "hint": "Mínimo Q100 por visita",
+    "chips": [
+      "Cambiar tomacorriente o interruptor",
+      "Instalar lámpara",
+      "Revisar tablero",
+      "Falla o corto circuito"
+    ]
+  },
+  {
+    "id": "plomeria",
+    "name": "Plomería",
+    "icon": "drop",
+    "mode": "fixed",
+    "hint": "Mínimo Q100 por visita",
+    "chips": [
+      "Reparar fuga",
+      "Instalar lavamanos o inodoro",
+      "Destapar drenaje",
+      "Revisar tubería"
+    ]
+  },
+  {
+    "id": "albanileria",
+    "name": "Albañilería",
+    "icon": "brick",
+    "mode": "fixed",
+    "hint": "Mínimo Q100 por visita",
+    "chips": [
+      "Reparar pared",
+      "Levantar muro",
+      "Arreglar repello",
+      "Fundir piso"
+    ]
+  },
+  {
+    "id": "carpinteria",
+    "name": "Carpintería",
+    "icon": "square",
+    "mode": "fixed",
+    "hint": "Mínimo Q100 por visita",
+    "chips": [
+      "Reparar puerta",
+      "Hacer o arreglar mueble",
+      "Instalar repisas",
+      "Trabajo en madera"
+    ]
+  },
+  {
+    "id": "pintura",
+    "name": "Pintura",
+    "icon": "roller",
+    "mode": "fixed",
+    "hint": "Mínimo Q100 por visita",
+    "chips": [
+      "Pintar interiores",
+      "Pintar fachada",
+      "Retocar paredes",
+      "Pintar portón o reja"
+    ]
+  },
+  {
+    "id": "soldadura",
+    "name": "Soldadura y estructuras",
+    "icon": "flame",
+    "mode": "fixed",
+    "hint": "Mínimo Q100 por visita",
+    "chips": [
+      "Portón o reja",
+      "Barandal",
+      "Reparar estructura",
+      "Mesa o soporte metálico"
+    ]
+  },
+  {
+    "id": "nivelacion",
+    "name": "Nivelación de terreno",
+    "icon": "terrain",
+    "mode": "fixed",
+    "hint": "Mínimo Q100 por visita",
+    "chips": [
+      "Nivelar terreno",
+      "Preparar lote",
+      "Rellenar desnivel"
+    ]
+  }
 ];
 
 var WORKERS = [
-  {n:'Selvin Castañeda',p:'54495800',t:['Jardinería'],s:['jardineria']},
-  {n:'Rolandon Castro',p:'46409393',t:['Jardinería'],s:['jardineria']},
-  {n:'Don Raúl',p:'59119615',t:['Jardinería'],s:['jardineria']},
-  {n:'Juan Gutiérrez',p:'49960442',t:['Jardinería'],s:['jardineria']},
-  {n:'Don Chico',p:'50664969',t:['Soldadura'],s:['soldadura']},
-  {n:'Alberto Caal',p:'59341350',t:['Electricidad'],s:['electricidad']},
-  {n:'Ronaldo Vasquez Barbas',p:'32998339',t:['Jardinería'],s:['jardineria']},
-  {n:'Pio Aldana',p:'49650218',t:['Plomería'],s:['plomeria']},
-  {n:'Marvin Chamale',p:'31256933',t:['Electricidad'],s:['electricidad']},
-  {n:'Eduardo Santizo',p:'50473923',t:['Carpintería','pintura','limpieza'],s:['carpinteria','pintura','limpieza']},
-  {n:'Don José',p:'49598702',t:['Chapeo','soldadura','estructuras básicas','electricidad'],s:['jardineria','soldadura','electricidad']},
-  {n:'Osman',p:'37739809',t:['Chapeo','nivelación de terrenos','fontanería básica'],s:['jardineria','nivelacion','plomeria']},
-  {n:'Chino Flores',p:'46621741',t:['Fontanería','albañilería'],s:['plomeria','albanileria']},
-  {n:'Oscar Ordóñez',p:'37055493',t:['Albañilería'],s:['albanileria']},
-  {n:'Juan José Ramos',p:'41261486',t:['Albañilería'],s:['albanileria']},
-  {n:'Bryan Acevedo',p:'58176962',t:['Electricidad'],s:['electricidad']},
-  {n:'Amner Pérez',p:'39503622',t:['Albañilería'],s:['albanileria']},
-  {n:'Jesús López',p:'47363767',t:['Electricidad'],s:['electricidad']}
+  {
+    "n": "Selvin Castañeda",
+    "p": "54495800",
+    "t": [
+      "Jardinería"
+    ],
+    "s": [
+      "jardineria"
+    ]
+  },
+  {
+    "n": "Rolandon Castro",
+    "p": "46409393",
+    "t": [
+      "Jardinería"
+    ],
+    "s": [
+      "jardineria"
+    ]
+  },
+  {
+    "n": "Don Raúl",
+    "p": "59119615",
+    "t": [
+      "Jardinería"
+    ],
+    "s": [
+      "jardineria"
+    ]
+  },
+  {
+    "n": "Juan Gutiérrez",
+    "p": "49960442",
+    "t": [
+      "Jardinería"
+    ],
+    "s": [
+      "jardineria"
+    ]
+  },
+  {
+    "n": "Don Chico",
+    "p": "50664969",
+    "t": [
+      "Soldadura"
+    ],
+    "s": [
+      "soldadura"
+    ]
+  },
+  {
+    "n": "Alberto Caal",
+    "p": "59341350",
+    "t": [
+      "Electricidad"
+    ],
+    "s": [
+      "electricidad"
+    ]
+  },
+  {
+    "n": "Ronaldo Vasquez Barbas",
+    "p": "32998339",
+    "t": [
+      "Jardinería"
+    ],
+    "s": [
+      "jardineria"
+    ]
+  },
+  {
+    "n": "Pio Aldana",
+    "p": "49650218",
+    "t": [
+      "Plomería"
+    ],
+    "s": [
+      "plomeria"
+    ]
+  },
+  {
+    "n": "Marvin Chamale",
+    "p": "31256933",
+    "t": [
+      "Electricidad"
+    ],
+    "s": [
+      "electricidad"
+    ]
+  },
+  {
+    "n": "Eduardo Santizo",
+    "p": "50473923",
+    "t": [
+      "Carpintería",
+      "pintura",
+      "limpieza"
+    ],
+    "s": [
+      "carpinteria",
+      "pintura",
+      "limpieza"
+    ]
+  },
+  {
+    "n": "Don José",
+    "p": "49598702",
+    "t": [
+      "Chapeo",
+      "soldadura",
+      "estructuras básicas",
+      "electricidad"
+    ],
+    "s": [
+      "jardineria",
+      "soldadura",
+      "electricidad"
+    ]
+  },
+  {
+    "n": "Osman",
+    "p": "37739809",
+    "t": [
+      "Chapeo",
+      "nivelación de terrenos",
+      "fontanería básica"
+    ],
+    "s": [
+      "jardineria",
+      "nivelacion",
+      "plomeria"
+    ]
+  },
+  {
+    "n": "Chino Flores",
+    "p": "46621741",
+    "t": [
+      "Fontanería",
+      "albañilería"
+    ],
+    "s": [
+      "plomeria",
+      "albanileria"
+    ]
+  },
+  {
+    "n": "Oscar Ordóñez",
+    "p": "37055493",
+    "t": [
+      "Albañilería"
+    ],
+    "s": [
+      "albanileria"
+    ]
+  },
+  {
+    "n": "Juan José Ramos",
+    "p": "41261486",
+    "t": [
+      "Albañilería"
+    ],
+    "s": [
+      "albanileria"
+    ]
+  },
+  {
+    "n": "Bryan Acevedo",
+    "p": "58176962",
+    "t": [
+      "Electricidad"
+    ],
+    "s": [
+      "electricidad"
+    ]
+  },
+  {
+    "n": "Amner Pérez",
+    "p": "39503622",
+    "t": [
+      "Albañilería"
+    ],
+    "s": [
+      "albanileria"
+    ]
+  },
+  {
+    "n": "Jesús López",
+    "p": "47363767",
+    "t": [
+      "Electricidad"
+    ],
+    "s": [
+      "electricidad"
+    ]
+  }
 ];
 
 var PLANS = [
-  {name:'Jardín Siempre Verde',sub:'Mantenimiento de jardín',freq:'Quincenal',price:340,per:'al mes',
-   about:'Chapeo y limpieza general del jardín cada quince días. Pensado para casas y condominios con área verde pequeña o mediana.',
-   cmp:'Sin plan pagarías Q400.00 al mes (2 visitas de Q200.00).',save:'Ahorras Q60.00 al mes',
-   facts:[['Frecuencia','2 visitas al mes'],['Área de referencia','Hasta 100 m²']],
-   perks:['Precio fijo mensual, sin importar si el pasto crece más un mes que otro.','Mismo trabajador asignado, que ya conoce el terreno.','Agenda prioritaria frente a clientes sin contrato.','Sin recargo por servicio urgente si se necesita mover la fecha.']},
-  {name:'Evento Impecable',sub:'Limpieza de salones de eventos',freq:'Cada sábado',price:3600,per:'al mes',
-   about:'Limpieza extrema después de cada evento del fin de semana. Turno fijo cada sábado en la noche o domingo temprano.',
-   cmp:'Sin plan pagarías Q4,000.00 al mes (4 visitas de Q1,000.00).',save:'Ahorras Q400.00 al mes',
-   facts:[['Frecuencia','4 visitas al mes'],['Área de referencia','200 m²'],['Tipo de limpieza','Extrema, Q5.00/m²']],
-   perks:['Turno fijo garantizado cada sábado, sin necesidad de pedir el servicio cada vez.','El salón queda listo antes del siguiente evento agendado.','Personal capacitado en limpieza post-evento (vidrio, piso, mobiliario).','Insumos de limpieza incluidos en el precio del plan.']},
-  {name:'Terreno Cuidado',sub:'Chapeo recurrente',freq:'Mensual',price:225,per:'al mes',
-   about:'Chapeo constante para terrenos, aldeas o propiedades con área verde grande, para que la maleza no se descontrole.',
-   cmp:'Sin plan pagarías Q262.50 por visita.',save:'Ahorras Q37.50 al mes',
-   facts:[['Frecuencia','1 visita al mes'],['Área de referencia','150 m²']],
-   perks:['El terreno nunca llega a un estado de maleza alta que cueste más limpiar.','Visita programada, sin depender de acordarse de llamar.','Precio protegido aunque suba la tarifa general de chapeo durante el año del contrato.']},
-  {name:'Hogar Seguro Eléctrico',sub:'Mantenimiento eléctrico preventivo',freq:'Trimestral',price:150,per:'por trimestre',
-   about:'Revisión general cada tres meses del tablero, los tomacorrientes y las conexiones visibles, para prevenir fallos antes de que pasen.',
-   cmp:'Además tienes 15% de descuento en cualquier reparación que se detecte en la revisión.',save:'',
-   facts:[['Frecuencia','1 revisión cada 3 meses']],
-   perks:['Detecta problemas eléctricos antes de que se vuelvan una emergencia.','Descuento automático si se necesita una reparación después de la revisión.','Prioridad de atención si surge una emergencia eléctrica entre revisiones.']}
+  {
+    "name": "Jardín Siempre Verde",
+    "sub": "Mantenimiento de jardín",
+    "freq": "Quincenal",
+    "price": 340,
+    "per": "al mes",
+    "about": "Chapeo y limpieza general del jardín cada quince días. Pensado para casas y condominios con área verde pequeña o mediana.",
+    "cmp": "Sin plan pagarías Q400.00 al mes (2 visitas de Q200.00).",
+    "save": "Ahorras Q60.00 al mes",
+    "facts": [
+      [
+        "Frecuencia",
+        "2 visitas al mes"
+      ],
+      [
+        "Área de referencia",
+        "Hasta 100 m²"
+      ]
+    ],
+    "perks": [
+      "Precio fijo mensual, sin importar si el pasto crece más un mes que otro.",
+      "Mismo trabajador asignado, que ya conoce el terreno.",
+      "Agenda prioritaria frente a clientes sin contrato.",
+      "Sin recargo por servicio urgente si se necesita mover la fecha."
+    ]
+  },
+  {
+    "name": "Evento Impecable",
+    "sub": "Limpieza de salones de eventos",
+    "freq": "Cada sábado",
+    "price": 3600,
+    "per": "al mes",
+    "about": "Limpieza extrema después de cada evento del fin de semana. Turno fijo cada sábado en la noche o domingo temprano.",
+    "cmp": "Sin plan pagarías Q4,000.00 al mes (4 visitas de Q1,000.00).",
+    "save": "Ahorras Q400.00 al mes",
+    "facts": [
+      [
+        "Frecuencia",
+        "4 visitas al mes"
+      ],
+      [
+        "Área de referencia",
+        "200 m²"
+      ],
+      [
+        "Tipo de limpieza",
+        "Extrema, Q5.00/m²"
+      ]
+    ],
+    "perks": [
+      "Turno fijo garantizado cada sábado, sin necesidad de pedir el servicio cada vez.",
+      "El salón queda listo antes del siguiente evento agendado.",
+      "Personal capacitado en limpieza post-evento (vidrio, piso, mobiliario).",
+      "Insumos de limpieza incluidos en el precio del plan."
+    ]
+  },
+  {
+    "name": "Terreno Cuidado",
+    "sub": "Chapeo recurrente",
+    "freq": "Mensual",
+    "price": 225,
+    "per": "al mes",
+    "about": "Chapeo constante para terrenos, aldeas o propiedades con área verde grande, para que la maleza no se descontrole.",
+    "cmp": "Sin plan pagarías Q262.50 por visita.",
+    "save": "Ahorras Q37.50 al mes",
+    "facts": [
+      [
+        "Frecuencia",
+        "1 visita al mes"
+      ],
+      [
+        "Área de referencia",
+        "150 m²"
+      ]
+    ],
+    "perks": [
+      "El terreno nunca llega a un estado de maleza alta que cueste más limpiar.",
+      "Visita programada, sin depender de acordarse de llamar.",
+      "Precio protegido aunque suba la tarifa general de chapeo durante el año del contrato."
+    ]
+  },
+  {
+    "name": "Hogar Seguro Eléctrico",
+    "sub": "Mantenimiento eléctrico preventivo",
+    "freq": "Trimestral",
+    "price": 150,
+    "per": "por trimestre",
+    "about": "Revisión general cada tres meses del tablero, los tomacorrientes y las conexiones visibles, para prevenir fallos antes de que pasen.",
+    "cmp": "Además tienes 15% de descuento en cualquier reparación que se detecte en la revisión.",
+    "save": "",
+    "facts": [
+      [
+        "Frecuencia",
+        "1 revisión cada 3 meses"
+      ]
+    ],
+    "perks": [
+      "Detecta problemas eléctricos antes de que se vuelvan una emergencia.",
+      "Descuento automático si se necesita una reparación después de la revisión.",
+      "Prioridad de atención si surge una emergencia eléctrica entre revisiones."
+    ]
+  }
 ];
 
 /* ====== Utilidades ====== */
