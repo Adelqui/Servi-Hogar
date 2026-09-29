@@ -246,6 +246,43 @@ details li{margin-bottom:6px}
 .hero-video-wrap .flare{position:absolute;left:0;top:83.19%;width:42%;height:2px;pointer-events:none;opacity:0;mix-blend-mode:screen;background:linear-gradient(90deg,rgba(255,170,90,0),rgba(255,180,110,.7) 35%,#fff7ea 50%,rgba(255,180,110,.7) 65%,rgba(255,170,90,0));box-shadow:0 0 10px 2px rgba(255,170,90,.55),0 0 28px 6px rgba(255,150,70,.25);border-radius:2px}
 .hero-video-wrap .flare::after{content:"";position:absolute;left:50%;top:50%;width:26%;aspect-ratio:3/1;transform:translate(-50%,-50%);background:radial-gradient(ellipse,rgba(255,240,220,.55),rgba(255,190,120,.15) 45%,rgba(255,190,120,0) 70%)}
 .hero-video-caption{text-align:center;color:var(--muted);font-size:.82rem;margin-top:8px}
+
+/* Carrusel de banners */
+.promo-carousel{position:relative;margin-top:18px;border-radius:16px;overflow:hidden}
+.promo-track{display:flex;transition:transform .45s cubic-bezier(.4,0,.2,1)}
+.promo-slide{flex:0 0 100%;background:linear-gradient(135deg,var(--primary),#0a3f4b);color:var(--on-primary);padding:20px;display:flex;flex-direction:column;gap:6px;min-height:132px;justify-content:center}
+.promo-eyebrow{font-size:.75rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;opacity:.85}
+.promo-title{font-family:var(--display);font-weight:800;font-stretch:110%;font-size:1.3rem;line-height:1.2}
+.promo-text{font-size:.9rem;opacity:.92;line-height:1.4}
+.promo-cta{align-self:flex-start;margin-top:6px;background:var(--accent);color:var(--on-accent);font-weight:700;font-size:.85rem;padding:9px 16px;border-radius:999px;border:0;cursor:pointer}
+.promo-dots{display:flex;justify-content:center;gap:7px;padding:12px 0 2px}
+.promo-dot{width:7px;height:7px;border-radius:50%;background:var(--line);border:0;padding:0;cursor:pointer}
+.promo-dot[aria-current="true"]{background:var(--primary);width:18px;border-radius:4px}
+
+/* Cuenta */
+.status-card{display:flex;align-items:center;gap:10px;padding:16px;border-radius:12px;background:var(--tint);margin-bottom:16px;font-size:.92rem}
+.acct-tabs{display:flex;gap:6px;margin:18px 0 16px;background:var(--tint);border-radius:12px;padding:4px}
+.acct-tab{flex:1;background:none;border:0;min-height:42px;border-radius:9px;font-weight:700;font-size:.9rem;color:var(--muted);cursor:pointer}
+.acct-tab[aria-current="page"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.acct-form{display:flex;flex-direction:column}
+.acct-err{color:var(--danger);font-size:.85rem;min-height:1.3em;margin:-4px 0 10px}
+.acct-head{display:flex;align-items:center;gap:12px;margin:18px 0 22px}
+.acct-head-info{flex:1;min-width:0;display:flex;flex-direction:column}
+.acct-head-info strong{font-size:1.1rem}
+.panel-block{background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:16px;margin-bottom:16px}
+.panel-block h2{font-size:1.05rem;margin-bottom:2px}
+.panel-block .panel-hint{margin-bottom:14px}
+.save-ok{color:var(--ok);font-weight:700;font-size:.88rem;text-align:center;margin-top:8px}
+.history-list{list-style:none;margin:0;padding:0}
+.history-item{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+.history-item:first-child{border-top:0}
+.history-main{display:flex;flex-direction:column}
+.history-svc{font-weight:700;font-size:.92rem}
+.history-date{font-size:.8rem;color:var(--muted)}
+.history-price{font-weight:700;white-space:nowrap}
+.icon-btn{background:none;border:1.5px solid var(--line);border-radius:10px;min-height:38px;padding:0 12px;color:var(--ink);font-weight:600;font-size:.85rem;cursor:pointer;flex:none}
+.spin{width:18px;height:18px;border-radius:50%;border:2.5px solid currentColor;border-right-color:transparent;animation:spin .7s linear infinite;flex:none}
+@keyframes spin{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}.tile:active{transform:none}}
 </style>
 </head>
@@ -284,6 +321,7 @@ details li{margin-bottom:6px}
       <button class="tab" data-tab="pedir" aria-current="page">Pedir servicio</button>
       <button class="tab" data-tab="planes">Planes</button>
       <button class="tab" data-tab="equipo">Trabajadores</button>
+      <button class="tab" data-tab="cuenta">Cuenta</button>
     </nav>
   </div>
 </header>
@@ -302,7 +340,10 @@ details li{margin-bottom:6px}
           <div class="flare" id="flare"></div>
         </div>
       </div>
-      <div class="hero-strip" id="heroStrip"></div>
+      <div class="promo-carousel" id="promoCarousel">
+        <div class="promo-track" id="promoTrack"></div>
+        <div class="promo-dots" id="promoDots"></div>
+      </div>
     </div>
     <ol class="stepper" id="stepper" aria-label="Progreso de la solicitud">
       <li>Servicio</li><li>Detalles</li><li>Trabajador</li>
@@ -327,6 +368,63 @@ details li{margin-bottom:6px}
     </div>
     <div class="filters" id="filters"></div>
     <ul class="team" id="teamList"></ul>
+  </section>
+
+  <section id="view-cuenta" hidden>
+    <div id="acctNotConfigured" hidden class="status-card">
+      <h1 style="font-size:clamp(1.5rem,6.5vw,2rem)">Cuenta</h1>
+      <p class="sub" style="margin-top:8px">Esta función todavía no está activada. El administrador de ServiHogar necesita conectar Firebase primero.</p>
+    </div>
+
+    <div id="acctLoading" class="status-card">
+      <div class="spin"></div><span>Cargando…</span>
+    </div>
+
+    <div id="acctLoggedOut" hidden>
+      <h1 style="font-size:clamp(1.7rem,7vw,2.3rem)">Tu cuenta</h1>
+      <p class="sub" style="margin-top:8px">Inicia sesión o crea una cuenta para guardar tus datos y ver tu historial de solicitudes.</p>
+      <div class="acct-tabs">
+        <button type="button" class="acct-tab" data-atab="login" aria-current="page">Iniciar sesión</button>
+        <button type="button" class="acct-tab" data-atab="register">Crear cuenta</button>
+      </div>
+      <form id="loginForm" class="acct-form">
+        <div class="field"><label for="loginEmail">Correo</label><input id="loginEmail" type="email" autocomplete="email" required></div>
+        <div class="field"><label for="loginPass">Contraseña</label><input id="loginPass" type="password" autocomplete="current-password" required></div>
+        <p class="acct-err" id="loginErr" role="alert"></p>
+        <button type="submit" class="btn full" id="loginSubmit">Iniciar sesión</button>
+      </form>
+      <form id="registerForm" class="acct-form" hidden>
+        <div class="field"><label for="regName">Tu nombre</label><input id="regName" type="text" autocomplete="name" required></div>
+        <div class="field"><label for="regEmail">Correo</label><input id="regEmail" type="email" autocomplete="email" required></div>
+        <div class="field"><label for="regPass">Contraseña</label><input id="regPass" type="password" autocomplete="new-password" minlength="6" required><p class="hint">Mínimo 6 caracteres.</p></div>
+        <p class="acct-err" id="registerErr" role="alert"></p>
+        <button type="submit" class="btn full" id="registerSubmit">Crear cuenta</button>
+      </form>
+    </div>
+
+    <div id="acctLoggedIn" hidden>
+      <div class="acct-head">
+        <span class="av" id="acctAvatar" style="--h:190;width:52px;height:52px;font-size:1.15rem">··</span>
+        <div class="acct-head-info"><strong id="acctName">—</strong><span id="acctEmail" class="w-trades"></span></div>
+        <button type="button" class="icon-btn" id="logoutBtn">Salir</button>
+      </div>
+
+      <section class="panel-block">
+        <h2>Mis datos</h2>
+        <p class="panel-hint">Se usan para completar tus solicitudes más rápido.</p>
+        <div class="field"><label for="pfName">Nombre</label><input id="pfName" type="text"></div>
+        <div class="field"><label for="pfZone">Colonia o dirección</label><input id="pfZone" type="text"></div>
+        <p class="acct-err" id="profileErr" role="alert"></p>
+        <button type="button" class="btn ghost full" id="profileSave">Guardar datos</button>
+        <p class="save-ok" id="profileSaved" hidden>Guardado ✓</p>
+      </section>
+
+      <section class="panel-block">
+        <h2>Mis solicitudes</h2>
+        <div id="historyEmpty" class="panel-hint" hidden>Todavía no has enviado ninguna solicitud.</div>
+        <ul class="history-list" id="historyList"></ul>
+      </section>
+    </div>
   </section>
 
   <footer class="foot">
@@ -504,7 +602,7 @@ function requestTarget(){
 /* ====== Navegación ====== */
 function showTab(t){
   state.tab=t;
-  ['pedir','planes','equipo'].forEach(function(k){
+  ['pedir','planes','equipo','cuenta'].forEach(function(k){
     $('#view-'+k).hidden=(k!==t);
   });
   document.querySelectorAll('.tab').forEach(function(b){
@@ -700,6 +798,14 @@ document.querySelector('.tabs').addEventListener('click',function(e){
   if(b.dataset.tab==='pedir'&&state.tab==='pedir'&&state.step!==1){go(1);return;}
   showTab(b.dataset.tab);
 });
+document.getElementById('view-cuenta').addEventListener('click',function(e){
+  var b=e.target.closest('[data-atab]');if(!b)return;
+  document.querySelectorAll('.acct-tab').forEach(function(t){
+    if(t===b)t.setAttribute('aria-current','page');else t.removeAttribute('aria-current');
+  });
+  $('#loginForm').hidden=b.dataset.atab!=='login';
+  $('#registerForm').hidden=b.dataset.atab!=='register';
+});
 $('#step1').addEventListener('click',function(e){
   var t=e.target.closest('[data-svc]');if(t)pickService(t.dataset.svc);
 });
@@ -779,7 +885,13 @@ $('#barSend').addEventListener('click',function(e){
   if(this.getAttribute('aria-disabled')==='true'){
     e.preventDefault();
     var p=$('#preview');if(p)p.scrollIntoView({block:'center'});
+    return;
   }
+  var q=quote();
+  window.dispatchEvent(new CustomEvent('sh:request-sent',{detail:{
+    service:serviceLabel(),
+    price:q?q.total:null
+  }}));
 });
 $('#filters').addEventListener('click',function(e){
   var c=e.target.closest('[data-filter]');if(!c)return;
@@ -863,6 +975,56 @@ $('#askForm').addEventListener('submit',function(e){
   input.value='';
 });
 
+/* ====== Carrusel de promociones ====== */
+var PROMOS=[
+  {eyebrow:'Precio claro',title:'Sin sorpresas al final',text:'Cotiza tu servicio y confirma el precio por WhatsApp antes de que alguien llegue a tu casa.',cta:'Ver servicios',tab:'pedir'},
+  {eyebrow:'Planes recurrentes',title:'Ahorra contratando fijo',text:'Jardín, limpieza de salones, chapeo y mantenimiento eléctrico con precio mensual y prioridad de agenda.',cta:'Ver planes',tab:'planes'},
+  {eyebrow:'Equipo verificado',title:'Trabajadores de confianza',text:'Todo nuestro equipo está afiliado y verificado por ServiHogar antes de llegar a tu hogar.',cta:'Conocer al equipo',tab:'equipo'}
+];
+var promoIdx=0,promoTimer=null;
+function renderPromoCarousel(){
+  $('#promoTrack').innerHTML=PROMOS.map(function(p){
+    return '<div class="promo-slide"><span class="promo-eyebrow">'+p.eyebrow+'</span><span class="promo-title">'+p.title+'</span><span class="promo-text">'+p.text+'</span><button type="button" class="promo-cta" data-goto="'+p.tab+'">'+p.cta+'</button></div>';
+  }).join('');
+  $('#promoDots').innerHTML=PROMOS.map(function(_,i){
+    return '<button type="button" class="promo-dot" data-dot="'+i+'" aria-current="'+(i===0)+'" aria-label="Promoción '+(i+1)+'"></button>';
+  }).join('');
+  goToPromo(0,false);
+  startPromoTimer();
+  var track=$('#promoTrack');
+  track.addEventListener('click',function(e){
+    var b=e.target.closest('[data-goto]');if(!b)return;
+    showTab(b.dataset.goto);
+  });
+  $('#promoDots').addEventListener('click',function(e){
+    var b=e.target.closest('[data-dot]');if(!b)return;
+    goToPromo(+b.dataset.dot,true);
+  });
+  var startX=null;
+  track.addEventListener('touchstart',function(e){startX=e.touches[0].clientX;stopPromoTimer();},{passive:true});
+  track.addEventListener('touchend',function(e){
+    if(startX===null)return;
+    var dx=e.changedTouches[0].clientX-startX;
+    if(dx<-40)goToPromo(promoIdx+1,true);
+    else if(dx>40)goToPromo(promoIdx-1,true);
+    startX=null;startPromoTimer();
+  },{passive:true});
+}
+function goToPromo(i,userAction){
+  var n=PROMOS.length;
+  promoIdx=((i%n)+n)%n;
+  $('#promoTrack').style.transform='translateX(-'+(promoIdx*100)+'%)';
+  document.querySelectorAll('.promo-dot').forEach(function(d,i2){
+    d.setAttribute('aria-current',String(i2===promoIdx));
+  });
+  if(userAction)startPromoTimer();
+}
+function startPromoTimer(){
+  stopPromoTimer();
+  promoTimer=setInterval(function(){goToPromo(promoIdx+1,false);},5000);
+}
+function stopPromoTimer(){if(promoTimer)clearInterval(promoTimer);}
+
 /* ====== Inicio ====== */
 (function initContactBanners(){
   var genMsg='Hola ServiHogar, quisiera más información.';
@@ -871,11 +1033,17 @@ $('#askForm').addEventListener('submit',function(e){
   a2.href=waHref(SERVIHOGAR_WA,teamMsg);a2.innerHTML=icon('chat',18)+' Escribir por WhatsApp';
   fab.href=waHref(SERVIHOGAR_WA,genMsg);
 })();
-(function initHeroStrip(){
-  $('#heroStrip').innerHTML=SERVICES.map(function(s){
-    return '<span class="hero-chip"><span class="hero-ico">'+icon(s.icon,17)+'</span>'+s.name+'</span>';
-  }).join('');
-})();
+renderPromoCarousel();
+window.ServiHogarApp={
+  setProfile:function(name,zone){
+    if(name)state.name=name;
+    if(zone)state.zone=zone;
+    persist();
+    var nameEl=document.getElementById('name'),zoneEl=document.getElementById('zone');
+    if(nameEl&&!nameEl.value)nameEl.value=state.name;
+    if(zoneEl&&!zoneEl.value)zoneEl.value=state.zone;
+  }
+};
 renderAskChips();
 renderTiles();renderTeam();renderPlans();
 go(1);
@@ -941,6 +1109,186 @@ let loaded=0;
 if(els[0].dim.decode)els.forEach(o=>o.dim.decode().then(()=>{if(++loaded===els.length)setTimeout(play,300)}));
 else setTimeout(play,600);
 addEventListener('resize',()=>requestAnimationFrame(frame));
+</script>
+
+<script type="module">
+/* ==========================================================================
+   ServiHogar · Cuenta (Firebase Authentication + Firestore)
+   --------------------------------------------------------------------------
+   Para activar "Iniciar sesión" y "Crear cuenta", pega aquí abajo la
+   configuración de tu propio proyecto de Firebase (la guía completa está
+   en el archivo FIREBASE.md que viene junto a este sitio). Mientras
+   FIREBASE_CONFIG tenga el valor de ejemplo, la pestaña "Cuenta" muestra
+   un aviso y el resto de la app funciona exactamente igual.
+   ========================================================================== */
+const FIREBASE_CONFIG = {
+  apiKey: "PEGA_AQUI_TU_API_KEY",
+  authDomain: "PEGA_AQUI_TU_PROYECTO.firebaseapp.com",
+  projectId: "PEGA_AQUI_TU_PROYECTO",
+  storageBucket: "PEGA_AQUI_TU_PROYECTO.appspot.com",
+  messagingSenderId: "000000000000",
+  appId: "PEGA_AQUI_TU_APP_ID"
+};
+
+const isConfigured = FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.apiKey.indexOf('PEGA_AQUI') === -1;
+
+const $ = (s) => document.querySelector(s);
+
+if (!isConfigured) {
+  $('#acctLoading').hidden = true;
+  $('#acctNotConfigured').hidden = false;
+} else {
+  bootFirebase();
+}
+
+async function bootFirebase(){
+  const { initializeApp } = await import('https://cdn.jsdelivr.net/npm/firebase@10.13.2/firebase-app.js');
+  const {
+    getAuth, onAuthStateChanged, createUserWithEmailAndPassword,
+    signInWithEmailAndPassword, signOut, updateProfile
+  } = await import('https://cdn.jsdelivr.net/npm/firebase@10.13.2/firebase-auth.js');
+  const {
+    getFirestore, doc, getDoc, setDoc, collection, addDoc,
+    query, orderBy, limit, getDocs, serverTimestamp
+  } = await import('https://cdn.jsdelivr.net/npm/firebase@10.13.2/firebase-firestore.js');
+
+  const app = initializeApp(FIREBASE_CONFIG);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+  let currentUid = null;
+
+  function initials(name){
+    var w=(name||'').trim().split(' ').filter(Boolean);
+    return w.length ? (w[0][0]+(w[1]?w[1][0]:'')).toUpperCase() : '··';
+  }
+  function hue(str){var H=[170,190,205,45,95,150],h=0;for(var i=0;i<str.length;i++)h=(h*31+str.charCodeAt(i))>>>0;return H[h%H.length];}
+  function fmtMoney(n){return n==null?'—':'Q'+(Math.round(n*100)/100).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',');}
+  function fmtDate(ts){
+    try{
+      var d = ts && ts.toDate ? ts.toDate() : new Date();
+      return d.toLocaleDateString('es-GT',{day:'numeric',month:'short',year:'numeric'});
+    }catch(e){return '';}
+  }
+
+  onAuthStateChanged(auth, async (user) => {
+    $('#acctLoading').hidden = true;
+    if (user) {
+      currentUid = user.uid;
+      $('#acctLoggedOut').hidden = true;
+      $('#acctLoggedIn').hidden = false;
+
+      let profile = { name: user.displayName || '', zone: '' };
+      try {
+        const snap = await getDoc(doc(db, 'users', user.uid));
+        if (snap.exists()) profile = Object.assign(profile, snap.data());
+      } catch (e) { /* si falla la lectura, seguimos con lo básico */ }
+
+      $('#acctAvatar').textContent = initials(profile.name || user.email);
+      $('#acctAvatar').style.setProperty('--h', hue(profile.name || user.email || 'x'));
+      $('#acctName').textContent = profile.name || 'Sin nombre';
+      $('#acctEmail').textContent = user.email || '';
+      $('#pfName').value = profile.name || '';
+      $('#pfZone').value = profile.zone || '';
+
+      if (window.ServiHogarApp) window.ServiHogarApp.setProfile(profile.name, profile.zone);
+
+      loadHistory(user.uid);
+    } else {
+      currentUid = null;
+      $('#acctLoggedIn').hidden = true;
+      $('#acctLoggedOut').hidden = false;
+    }
+  });
+
+  async function loadHistory(uid){
+    var list = $('#historyList'), empty = $('#historyEmpty');
+    list.innerHTML = '';
+    try {
+      const q = query(collection(db, 'users', uid, 'requests'), orderBy('createdAt', 'desc'), limit(20));
+      const snap = await getDocs(q);
+      if (snap.empty) { empty.hidden = false; return; }
+      empty.hidden = true;
+      snap.forEach((docSnap) => {
+        const r = docSnap.data();
+        const li = document.createElement('li');
+        li.className = 'history-item';
+        li.innerHTML = '<div class="history-main"><span class="history-svc"></span><span class="history-date"></span></div><span class="history-price"></span>';
+        li.querySelector('.history-svc').textContent = r.service || 'Servicio';
+        li.querySelector('.history-date').textContent = fmtDate(r.createdAt);
+        li.querySelector('.history-price').textContent = fmtMoney(r.price);
+        list.appendChild(li);
+      });
+    } catch (e) { empty.hidden = false; }
+  }
+
+  window.addEventListener('sh:request-sent', async (e) => {
+    if (!currentUid) return;
+    try {
+      await addDoc(collection(db, 'users', currentUid, 'requests'), {
+        service: e.detail.service || '',
+        price: e.detail.price,
+        createdAt: serverTimestamp()
+      });
+      loadHistory(currentUid);
+    } catch (err) { /* si falla el guardado, no interrumpe el envío por WhatsApp */ }
+  });
+
+  $('#loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const errEl = $('#loginErr'); errEl.textContent = '';
+    const btn = $('#loginSubmit'); btn.disabled = true;
+    try {
+      await signInWithEmailAndPassword(auth, $('#loginEmail').value.trim(), $('#loginPass').value);
+    } catch (err) {
+      errEl.textContent = friendlyAuthError(err);
+    } finally { btn.disabled = false; }
+  });
+
+  $('#registerForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const errEl = $('#registerErr'); errEl.textContent = '';
+    const btn = $('#registerSubmit'); btn.disabled = true;
+    const name = $('#regName').value.trim();
+    try {
+      const cred = await createUserWithEmailAndPassword(auth, $('#regEmail').value.trim(), $('#regPass').value);
+      await updateProfile(cred.user, { displayName: name });
+      await setDoc(doc(db, 'users', cred.user.uid), { name: name, zone: '' });
+    } catch (err) {
+      errEl.textContent = friendlyAuthError(err);
+    } finally { btn.disabled = false; }
+  });
+
+  $('#logoutBtn').addEventListener('click', () => signOut(auth));
+
+  $('#profileSave').addEventListener('click', async () => {
+    if (!currentUid) return;
+    const errEl = $('#profileErr'), okEl = $('#profileSaved');
+    errEl.textContent = ''; okEl.hidden = true;
+    const name = $('#pfName').value.trim(), zone = $('#pfZone').value.trim();
+    try {
+      await setDoc(doc(db, 'users', currentUid), { name: name, zone: zone }, { merge: true });
+      $('#acctName').textContent = name || 'Sin nombre';
+      if (window.ServiHogarApp) window.ServiHogarApp.setProfile(name, zone);
+      okEl.hidden = false;
+      setTimeout(() => { okEl.hidden = true; }, 2500);
+    } catch (err) {
+      errEl.textContent = 'No se pudo guardar. Intenta de nuevo.';
+    }
+  });
+
+  function friendlyAuthError(err){
+    var code = err && err.code || '';
+    var map = {
+      'auth/invalid-email': 'Correo inválido.',
+      'auth/user-not-found': 'No existe una cuenta con ese correo.',
+      'auth/wrong-password': 'Contraseña incorrecta.',
+      'auth/invalid-credential': 'Correo o contraseña incorrectos.',
+      'auth/email-already-in-use': 'Ya existe una cuenta con ese correo.',
+      'auth/weak-password': 'La contraseña debe tener al menos 6 caracteres.'
+    };
+    return map[code] || 'Ocurrió un error. Intenta de nuevo.';
+  }
+}
 </script>
 <script>
 if ('serviceWorker' in navigator) {
