@@ -1,8 +1,10 @@
 // ServiHogar — Service Worker
-// Cachea el "app shell" para que la app abra rápido y funcione sin internet.
-// Los enlaces a WhatsApp siguen necesitando conexión para enviarse.
+// Estrategia: las páginas (index.html, admin.html) siempre se piden primero
+// a la red, para que cualquier actualización se vea de inmediato; solo se
+// usa la copia guardada si no hay internet. Los íconos y el manifest sí se
+// guardan en caché desde el principio, porque casi nunca cambian.
 
-const CACHE_NAME = 'servihogar-v1';
+const CACHE_NAME = 'servihogar-v2';
 const APP_SHELL = [
   './',
   './index.html',
@@ -32,8 +34,6 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Cache-first para el app shell; red directa (sin interceptar) para todo lo demás,
-// como los enlaces salientes a wa.me y tel:.
 self.addEventListener('fetch', (event) => {
   const req = event.request;
   if (req.method !== 'GET') return;
@@ -41,6 +41,24 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;
 
+  const isPage = req.mode === 'navigate' ||
+    (req.headers.get('accept') || '').includes('text/html');
+
+  if (isPage) {
+    // Red primero: siempre trae la versión más reciente cuando hay internet.
+    event.respondWith(
+      fetch(req)
+        .then((res) => {
+          const copy = res.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(req, copy));
+          return res;
+        })
+        .catch(() => caches.match(req).then((cached) => cached || caches.match('./index.html')))
+    );
+    return;
+  }
+
+  // Cache primero para íconos, manifest, etc. (cambian muy rara vez).
   event.respondWith(
     caches.match(req).then((cached) => {
       if (cached) return cached;
@@ -49,8 +67,7 @@ self.addEventListener('fetch', (event) => {
           const copy = res.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(req, copy));
           return res;
-        })
-        .catch(() => caches.match('./index.html'));
+        });
     })
   );
 });
