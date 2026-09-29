@@ -383,6 +383,8 @@ function renderWorkers(){
       '<div class="field"><label>Nombre</label><input type="text" data-wf="n" value="'+esc(w.n)+'"></div>' +
       '<div class="field"><label>Teléfono</label><input type="tel" data-wf="p" value="'+esc(w.p)+'"></div>' +
       '<div class="field"><label>Oficios (como se muestran, separados por coma)</label><input type="text" data-wf="t" value="'+esc(w.t.join(', '))+'"></div>' +
+      '<div class="field"><label>URL de foto (opcional)</label><input type="text" data-wf="photo" placeholder="https://..." value="'+esc(w.photo||'')+'">' +
+      '<p class="desc">Pega el enlace directo a una foto ya subida (por ejemplo, a Google Drive con acceso público, Imgur, etc.). Si lo dejas vacío, se muestran las iniciales.</p></div>' +
       '<div class="field"><label>Aparece en estos servicios</label><div class="svc-check-grid">' +
       DATA.services.map(function(svc){
         var checked = w.s.indexOf(svc.id) > -1;
@@ -398,6 +400,7 @@ function renderWorkers(){
     card.querySelector('[data-wf="t"]').addEventListener('input', function(){
       DATA.workers[wi].t = this.value.split(',').map(function(s){return s.trim();}).filter(Boolean);
     });
+    card.querySelector('[data-wf="photo"]').addEventListener('input', function(){ DATA.workers[wi].photo = this.value.trim(); });
     card.querySelectorAll('[data-ws]').forEach(function(cb){
       cb.addEventListener('change', function(){
         var sid = this.dataset.ws;
@@ -418,7 +421,7 @@ function renderWorkers(){
   });
 }
 $('#addWorkerBtn').addEventListener('click', function(){
-  DATA.workers.push({ n:'', p:'', t:[], s:[] });
+  DATA.workers.push({ n:'', p:'', t:[], s:[], photo:'' });
   renderWorkers();
   var cards = document.querySelectorAll('.worker-card');
   var last = cards[cards.length-1];
