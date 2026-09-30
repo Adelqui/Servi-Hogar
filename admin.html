@@ -353,10 +353,15 @@ function renderRates(){
           return '<div class="rate-row"><label>' + esc(opt.name) + '</label>' +
             '<div class="unit-field"><input type="number" min="0" step="0.05" value="' + opt.rate + '" data-svc="' + si + '" data-opt="' + oi + '"><span>Q/m²</span></div></div>';
         }).join('') + '</div>';
+    }else if(svc.mode === 'hourly'){
+      return '<div class="rate-card"><h3>' + esc(svc.name) + '</h3>' +
+        '<p class="svc-hint">Precio por hora.</p>' +
+        '<div class="rate-row"><label>Tarifa</label>' +
+        '<div class="unit-field"><input type="number" min="0" step="1" value="' + svc.rate + '" data-hourly="' + si + '"><span>Q/hora</span></div></div></div>';
     }else{
       return '<div class="rate-card"><h3>' + esc(svc.name) + '</h3>' +
         '<p class="svc-hint">Tarifa fija, con el mínimo general de Q' + DATA.minVisit + ' por visita. Opciones rápidas que ve el cliente:</p>' +
-        '<div class="chips-field"><textarea rows="4" data-chips="' + si + '">' + esc(svc.chips.join('\n')) + '</textarea></div></div>';
+        '<div class="chips-field"><textarea rows="4" data-chips="' + si + '">' + esc((svc.chips||[]).join('\n')) + '</textarea></div></div>';
     }
   }).join('');
   el.querySelectorAll('input[data-svc]').forEach(function(inp){
@@ -364,6 +369,13 @@ function renderRates(){
       var si = +this.dataset.svc, oi = +this.dataset.opt;
       var v = parseFloat(this.value);
       DATA.services[si].options[oi].rate = isNaN(v) ? 0 : v;
+    });
+  });
+  el.querySelectorAll('input[data-hourly]').forEach(function(inp){
+    inp.addEventListener('input', function(){
+      var si = +this.dataset.hourly;
+      var v = parseFloat(this.value);
+      DATA.services[si].rate = isNaN(v) ? 0 : v;
     });
   });
   el.querySelectorAll('textarea[data-chips]').forEach(function(ta){
@@ -486,6 +498,8 @@ function recomputeHints(services, minVisit){
     if(svc.mode === 'area'){
       var min = Math.min.apply(null, svc.options.map(function(o){return o.rate;}));
       copy.hint = 'Desde Q' + rateNum(min) + ' por m²';
+    }else if(svc.mode === 'hourly'){
+      copy.hint = 'Q' + wholeNum(svc.rate) + ' por hora';
     }else{
       copy.hint = 'Mínimo Q' + wholeNum(minVisit) + ' por visita';
     }

@@ -509,7 +509,9 @@ var ICONS = {
   phone:'<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/>',
   home:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h5v-6h4v6h5V10"/>',
   calendar:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
-  users:'<path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>'
+  users:'<path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+  baby:'<circle cx="12" cy="10" r="5.2"/><circle cx="12" cy="10" r="1.4" fill="currentColor" stroke="none"/><path d="M12 15.2v2.3a2.3 2.3 0 1 0 2.3-2.3"/>',
+  paw:'<circle cx="7" cy="10" r="1.9"/><circle cx="12" cy="6.8" r="1.9"/><circle cx="17" cy="10" r="1.9"/><path d="M12 12.2c-3 0-5.3 2.1-5.3 4.4 0 1.8 1.5 3.2 3.4 3.2.9 0 1.5-.45 1.9-.45s1 .45 1.9.45c1.9 0 3.4-1.4 3.4-3.2 0-2.3-2.3-4.4-5.3-4.4z"/>'
 };
 function icon(n,s){s=s||22;return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+ICONS[n]+'</svg>';}
 
@@ -528,7 +530,9 @@ var SERVICES = [
   {id:'carpinteria',name:'Carpintería',icon:'square',mode:'fixed',hint:'Mínimo Q100 por visita',desc:'Reparación de puertas y muebles, instalación de repisas y trabajos generales en madera.',items:['Reparación de puertas y muebles','Instalación de repisas','Trabajos generales en madera','Ajuste de bisagras y cerraduras'],chips:['Reparar puerta','Hacer o arreglar mueble','Instalar repisas','Trabajo en madera']},
   {id:'pintura',name:'Pintura',icon:'roller',mode:'fixed',hint:'Mínimo Q100 por visita',desc:'Pintura de interiores y fachadas, retoque de paredes, y pintura de portones o rejas.',items:['Pintura de interiores','Pintura de fachadas','Retoque de paredes','Pintura de portones y rejas'],chips:['Pintar interiores','Pintar fachada','Retocar paredes','Pintar portón o reja']},
   {id:'soldadura',name:'Soldadura y estructuras',icon:'flame',mode:'fixed',hint:'Mínimo Q100 por visita',desc:'Fabricación o reparación de portones, rejas, barandales y estructuras metálicas.',items:['Fabricación de portones y rejas','Instalación de barandales','Reparación de estructuras metálicas','Fabricación de mesas o soportes'],chips:['Portón o reja','Barandal','Reparar estructura','Mesa o soporte metálico']},
-  {id:'nivelacion',name:'Nivelación de terreno',icon:'terrain',mode:'fixed',hint:'Mínimo Q100 por visita',desc:'Nivelación y preparación de terrenos, y relleno de desniveles para construcción o siembra.',items:['Nivelación de terreno','Preparación de lote','Relleno de desniveles','Compactación básica'],chips:['Nivelar terreno','Preparar lote','Rellenar desnivel']}
+  {id:'nivelacion',name:'Nivelación de terreno',icon:'terrain',mode:'fixed',hint:'Mínimo Q100 por visita',desc:'Nivelación y preparación de terrenos, y relleno de desniveles para construcción o siembra.',items:['Nivelación de terreno','Preparación de lote','Relleno de desniveles','Compactación básica'],chips:['Nivelar terreno','Preparar lote','Rellenar desnivel']},
+  {id:'ninera',name:'Niñera',icon:'baby',mode:'hourly',hint:'Q30 por hora',rate:30,desc:'Cuidado de niños en la comodidad de tu hogar, con atención, entretenimiento y seguridad.',items:['Entretenimiento: juegan y estimulan a los niños para mantenerlos felices','Seguridad y bienestar como prioridad, dando tranquilidad a los padres','Cuidado regular en casa, en un ambiente familiar y confiable']},
+  {id:'mascotas',name:'Cuidado de mascotas',icon:'paw',mode:'fixed',hint:'Desde Q100 por visita',desc:'Cuidador y paseador de mascotas a domicilio, según el tamaño del animal.',items:['Paseos y ejercicio diario','Alimentación y cuidados básicos','Compañía y atención mientras no estás en casa'],chips:['1–5 kg (mini)','5–10 kg (pequeño)','10–20 kg (mediano)','20–40 kg (grande)','40+ kg (gigante)']}
 ];
 
 var WORKERS = [
@@ -607,11 +611,20 @@ function persist(){try{localStorage.setItem(STORE,JSON.stringify({name:state.nam
 function svc(){return svcById(state.svc);}
 function opt(){var s=svc();return s&&s.options?s.options.filter(function(o){return o.id===state.opt;})[0]:null;}
 function quote(){
-  var s=svc();if(!s||s.mode!=='area')return null;
-  var a=parseFloat(state.area),o=opt();
-  if(!(a>0)||!o)return null;
-  var raw=Math.round(o.rate*a*100)/100;
-  return {raw:raw,total:Math.max(MIN_VISIT,raw),min:raw<MIN_VISIT,area:a,rate:o.rate};
+  var s=svc();if(!s)return null;
+  if(s.mode==='area'){
+    var a=parseFloat(state.area),o=opt();
+    if(!(a>0)||!o)return null;
+    var raw=Math.round(o.rate*a*100)/100;
+    return {raw:raw,total:Math.max(MIN_VISIT,raw),min:raw<MIN_VISIT,area:a,rate:o.rate};
+  }
+  if(s.mode==='hourly'){
+    var hrs=parseFloat(state.area);
+    if(!(hrs>0))return null;
+    var raw2=Math.round(s.rate*hrs*100)/100;
+    return {raw:raw2,total:raw2,min:false,area:hrs,rate:s.rate,unit:'hora'+(hrs===1?'':'s')};
+  }
+  return null;
 }
 function serviceLabel(){var s=svc(),o=opt();return o?o.label:s.name;}
 
@@ -625,6 +638,9 @@ function requestMessage(){
   if(s.mode==='area'&&q){
     L.push('Área: '+q.area+' m²');
     L.push('Precio estimado: '+money(q.total)+(q.min?' (mínimo por visita)':''));
+  }else if(s.mode==='hourly'&&q){
+    L.push('Horas: '+q.area+' '+q.unit);
+    L.push('Precio estimado: '+money(q.total)+' ('+money(s.rate)+'/hora)');
   }else{
     var job=state.chips.slice();
     if(state.desc.trim())job.push(state.desc.trim());
@@ -680,6 +696,11 @@ function tileBackList(s){
       return '<li><span>'+o.name+'</span><b>'+money(o.rate)+'/m²</b></li>';
     }).join('');
   }
+  if(s.mode==='hourly'){
+    var rateLi='<li><span>Precio</span><b>'+money(s.rate)+'/hora</b></li>';
+    var itemsLi=(s.items||[]).slice(0,3).map(function(it){return '<li><span>'+it+'</span></li>';}).join('');
+    return rateLi+itemsLi;
+  }
   return (s.items||s.chips||[]).slice(0,4).map(function(it){
     return '<li><span>'+it+'</span></li>';
   }).join('');
@@ -689,7 +710,7 @@ function renderTiles(){
     var n=workersFor(s.id).length;
     return '<div class="tile-flip" data-svc="'+s.id+'"><div class="tile-inner">'+
       '<button type="button" class="tile-face tile-front" data-flip="'+s.id+'">'+
-        '<span class="ico">'+icon(s.icon,24)+'</span><span class="t-name">'+s.name+'</span><span class="t-hint">'+s.hint+'</span><span class="t-count">'+n+' trabajador'+(n>1?'es':'')+'</span>'+
+        '<span class="ico">'+icon(s.icon,24)+'</span><span class="t-name">'+s.name+'</span><span class="t-hint">'+s.hint+'</span><span class="t-count">'+n+' trabajador'+(n===1?'':'es')+'</span>'+
       '</button>'+
       '<div class="tile-face tile-back">'+
         '<div class="tile-back-head"><span class="t-name">'+s.name+'</span><button type="button" class="tile-choose" data-choose="'+s.id+'">Elegir</button></div>'+
@@ -713,6 +734,11 @@ function buildStep2(){
   h+='<button class="back" type="button" data-act="to1">'+icon('back',18)+' Cambiar servicio</button>';
   h+='<h2 class="h-svc"><span class="ico">'+icon(s.icon,22)+'</span>'+s.name+'</h2>';
   if(s.desc)h+='<p class="svc-desc">'+s.desc+'</p>';
+  if(s.items&&s.mode!=='area'){
+    var svcItemsId='items-svc-'+s.id;
+    h+='<div class="opt-wrap" style="margin-bottom:18px"><button type="button" class="opt-toggle svc-toggle" data-toggle="'+svcItemsId+'" aria-expanded="false">Ver qué incluye <span class="chev">&#9662;</span></button>'+
+      '<div class="opt-items-wrap" id="'+svcItemsId+'"><ul class="opt-items">'+s.items.map(function(it){return '<li>'+it+'</li>';}).join('')+'</ul></div></div>';
+  }
   if(s.mode==='area'){
     h+='<fieldset class="group"><legend>Tipo de servicio</legend>'+s.options.map(function(o){
       var itemsId='items-'+s.id+'-'+o.id;
@@ -724,12 +750,10 @@ function buildStep2(){
     h+='<button type="button" class="linkbtn" data-act="calc">¿No sabes los metros? Calcula largo por ancho</button>';
     h+='<div class="calc" id="calc" hidden><div><label for="len">Largo (m)</label><input id="len" type="number" inputmode="decimal" min="0" step="any" value="'+esc(state.len)+'"></div><div><label for="wid">Ancho (m)</label><input id="wid" type="number" inputmode="decimal" min="0" step="any" value="'+esc(state.wid)+'"></div></div></div>';
     h+='<div class="quote empty" id="quote" aria-live="polite"></div>';
+  }else if(s.mode==='hourly'){
+    h+='<div class="field"><label for="area">Horas de cuidado</label><div class="unit"><input id="area" type="number" inputmode="decimal" min="0" step="any" placeholder="Ej. 4" value="'+esc(state.area)+'"><span>horas</span></div></div>';
+    h+='<div class="quote empty" id="quote" aria-live="polite"></div>';
   }else{
-    if(s.items){
-      var svcItemsId='items-svc-'+s.id;
-      h+='<div class="opt-wrap" style="margin-bottom:18px"><button type="button" class="opt-toggle svc-toggle" data-toggle="'+svcItemsId+'" aria-expanded="false">Ver qué incluye <span class="chev">&#9662;</span></button>'+
-        '<div class="opt-items-wrap" id="'+svcItemsId+'"><ul class="opt-items">'+s.items.map(function(it){return '<li>'+it+'</li>';}).join('')+'</ul></div></div>';
-    }
     h+='<div class="field" id="chips"><span class="lbl">¿Qué necesitas?</span><div class="chip-row">'+s.chips.map(function(c){
       return '<button type="button" class="chip" data-chip="'+esc(c)+'" aria-pressed="'+(state.chips.indexOf(c)>-1)+'">'+c+'</button>';
     }).join('')+'</div></div>';
@@ -749,10 +773,14 @@ function buildStep2(){
 }
 function updateQuote(){
   var box=$('#quote');if(!box)return;
-  var q=quote();
-  if(!q){box.className='quote empty';box.textContent='Escribe el área para ver el precio estimado.';return;}
+  var s=svc(),q=quote();
+  if(!q){box.className='quote empty';box.textContent=s.mode==='hourly'?'Escribe las horas para ver el precio.':'Escribe el área para ver el precio estimado.';return;}
   box.className='quote';
-  box.innerHTML='<span class="q-label">Precio estimado</span><span class="q-num">'+money(q.total)+'</span><span class="q-calc">'+q.area+' m² × '+money(q.rate)+'/m²'+(q.min?' = '+money(q.raw)+'. Se aplica el mínimo de '+money(MIN_VISIT)+' por visita.':'')+'</span>';
+  if(s.mode==='hourly'){
+    box.innerHTML='<span class="q-label">Precio estimado</span><span class="q-num">'+money(q.total)+'</span><span class="q-calc">'+q.area+' '+q.unit+' × '+money(q.rate)+'/hora</span>';
+  }else{
+    box.innerHTML='<span class="q-label">Precio estimado</span><span class="q-num">'+money(q.total)+'</span><span class="q-calc">'+q.area+' m² × '+money(q.rate)+'/m²'+(q.min?' = '+money(q.raw)+'. Se aplica el mínimo de '+money(MIN_VISIT)+' por visita.':'')+'</span>';
+  }
 }
 function step2Error(){
   var s=svc();
@@ -760,6 +788,10 @@ function step2Error(){
     var a=parseFloat(state.area);
     if(!(a>0))return {id:'area',msg:'Escribe el área en metros cuadrados.'};
     if(a>50000)return {id:'area',msg:'Para áreas tan grandes, pide una cotización directa por WhatsApp.'};
+  }else if(s.mode==='hourly'){
+    var hrs=parseFloat(state.area);
+    if(!(hrs>0))return {id:'area',msg:'Escribe las horas de cuidado.'};
+    if(hrs>24)return {id:'area',msg:'Para más de 24 horas, escríbenos directo por WhatsApp.'};
   }else if(!state.chips.length&&state.desc.trim().length<5){
     return {id:'chips',msg:'Elige o describe el trabajo que necesitas.'};
   }
@@ -784,7 +816,7 @@ function buildStep3(){
   var s=svc(),list=workersFor(s.id),h='';
   h+='<button class="back" type="button" data-act="to2">'+icon('back',18)+' Cambiar detalles</button>';
   h+='<h2 class="h-svc" style="margin-bottom:8px">¿Con quién quieres trabajar?</h2>';
-  h+='<p class="sub" style="margin-top:0">'+list.length+' trabajador'+(list.length>1?'es afiliados hacen':' afiliado hace')+' este servicio.</p>';
+  h+='<p class="sub" style="margin-top:0">'+(list.length===0?'Todavía no tenemos trabajadores afiliados para este servicio, pero podemos ayudarte igual.':(list.length+' trabajador'+(list.length===1?' afiliado hace':'es afiliados hacen')+' este servicio.'))+'</p>';
   h+='<fieldset class="group" style="margin-bottom:0"><legend class="sr" style="position:absolute;left:-9999px">Trabajador</legend>';
   if(SERVIHOGAR_WA){
     h+='<label class="worker"><input type="radio" name="worker" value="any"'+(state.worker==='any'?' checked':'')+'><span class="av" style="--h:45">SH</span><span class="w-main"><strong>Que ServiHogar asigne a alguien</strong><span class="w-trades">Te asignamos un trabajador disponible en tu zona</span></span></label>';
@@ -811,9 +843,10 @@ function updateBar(){
   document.body.classList.toggle('has-bar',!!show);
   if(!show)return;
   var s=svc(),q=quote(),next=$('#barNext'),send=$('#barSend');
-  var price=q?money(q.total):(s.mode==='area'?'Sin calcular':'Desde '+money(MIN_VISIT));
+  var priceKnownMode=(s.mode==='area'||s.mode==='hourly');
+  var price=q?money(q.total):(priceKnownMode?'Sin calcular':'Desde '+money(MIN_VISIT));
   if(state.step===2){
-    $('#barLabel').textContent=s.mode==='area'?'Precio estimado':'Precio';
+    $('#barLabel').textContent=priceKnownMode?'Precio estimado':'Precio';
     $('#barValue').textContent=price;
     next.hidden=false;send.hidden=true;
     next.setAttribute('aria-disabled',String(!!step2Error()));
