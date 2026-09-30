@@ -1138,19 +1138,27 @@ if (!isConfigured) {
   $('#acctLoading').hidden = true;
   $('#acctNotConfigured').hidden = false;
 } else {
-  bootFirebase();
+  bootFirebase().catch((err) => {
+    var box = $('#acctLoading');
+    box.hidden = true;
+    var errBox = $('#acctNotConfigured');
+    errBox.hidden = false;
+    var p = errBox.querySelector('p');
+    if (p) p.textContent = 'No se pudo conectar con la cuenta. Revisa tu conexión a internet e intenta de nuevo.';
+    console.error('ServiHogar Firebase:', err);
+  });
 }
 
 async function bootFirebase(){
-  const { initializeApp } = await import('https://cdn.jsdelivr.net/npm/firebase@10.13.2/firebase-app.js');
+  const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js');
   const {
     getAuth, onAuthStateChanged, createUserWithEmailAndPassword,
     signInWithEmailAndPassword, signOut, updateProfile
-  } = await import('https://cdn.jsdelivr.net/npm/firebase@10.13.2/firebase-auth.js');
+  } = await import('https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js');
   const {
     getFirestore, doc, getDoc, setDoc, collection, addDoc,
     query, orderBy, limit, getDocs, serverTimestamp
-  } = await import('https://cdn.jsdelivr.net/npm/firebase@10.13.2/firebase-firestore.js');
+  } = await import('https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js');
 
   const app = initializeApp(FIREBASE_CONFIG);
   const auth = getAuth(app);
