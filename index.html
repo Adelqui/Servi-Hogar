@@ -63,7 +63,7 @@ button{font:inherit;color:inherit}
 [hidden]{display:none!important}
 
 /* Encabezado */
-.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1px solid var(--line)}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in srgb,var(--bg) 55%,transparent);-webkit-backdrop-filter:blur(22px) saturate(180%);backdrop-filter:blur(22px) saturate(180%);border-bottom:1px solid rgba(255,255,255,.18)}
 .brand{display:flex;align-items:center;gap:10px;padding-top:12px;font:800 1.3rem var(--display);font-stretch:114%;letter-spacing:-.01em}
 .mark{width:36px;height:36px;flex:none;display:grid;place-items:center}
 .tabs{display:flex;gap:2px;margin-top:6px}
